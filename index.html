@@ -77,15 +77,17 @@
     <!-- 頂部導航列 -->
     <header class="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-md border-b border-slate-800 px-6 py-4">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="relative flex items-center justify-center p-2 bg-gradient-to-tr from-cyan-500 to-emerald-400 rounded-xl shadow-lg shadow-cyan-500/20">
+            <!-- 回首頁點擊區域 (左上角圖標標題整合) -->
+            <a href="index.html" class="flex items-center gap-3 hover:opacity-90 active:scale-95 transition-all select-none group" title="返回主入口畫面">
+                <div class="relative flex items-center justify-center p-2 bg-gradient-to-tr from-cyan-500 to-emerald-400 rounded-xl shadow-lg shadow-cyan-500/20 group-hover:shadow-cyan-400/30 transition-all">
                     <i data-lucide="atom" class="w-7 h-7 text-slate-950 atom-orbit"></i>
                 </div>
                 <div>
                     <h1 class="text-xl font-black bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent tracking-wider tech-font">CHEMHUB PORTAL</h1>
                     <p class="text-[10px] text-slate-400 uppercase tracking-widest tech-font">Virtual Chemistry Education Ecosystem</p>
                 </div>
-            </div>
+            </a>
+            
             <div class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
                 <a href="#modules" class="hover:text-cyan-400 transition-colors flex items-center gap-1.5"><i data-lucide="layers" class="w-4 h-4"></i> 四大核心模組</a>
                 <a href="#quick-explorer" class="hover:text-cyan-400 transition-colors flex items-center gap-1.5"><i data-lucide="search" class="w-4 h-4"></i> 元素/藥劑探索</a>
