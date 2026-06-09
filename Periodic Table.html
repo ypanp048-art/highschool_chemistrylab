@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>互動式元素週期表 - 探索化學世界</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght=300;400;500;700;900&family=Orbitron:wght=400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #0b0f19;
+            color: #f3f4f6;
+        }
+        .tech-font {
+            font-family: 'Orbitron', sans-serif;
+        }
+        /* 自訂滾動條 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111827;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4b5563;
+        }
+        /* 元素分類配色 */
+        .color-reactive-nonmetal { background-color: rgba(4, 120, 87, 0.2); border-color: rgb(16, 185, 129); color: rgb(110, 231, 183); }
+        .color-noble-gas { background-color: rgba(109, 40, 217, 0.2); border-color: rgb(139, 92, 246); color: rgb(196, 181, 253); }
+        .color-alkali-metal { background-color: rgba(185, 28, 28, 0.2); border-color: rgb(239, 68, 68); color: rgb(252, 165, 165); }
+        .color-alkaline-earth { background-color: rgba(194, 65, 12, 0.2); border-color: rgb(249, 115, 22); color: rgb(253, 186, 116); }
+        .color-metalloid { background-color: rgba(180, 83, 9, 0.2); border-color: rgb(217, 119, 6); color: rgb(252, 211, 77); }
+        .color-post-transition { background-color: rgba(67, 56, 202, 0.2); border-color: rgb(99, 102, 241); color: rgb(165, 180, 252); }
+        .color-transition { background-color: rgba(29, 78, 216, 0.2); border-color: rgb(59, 130, 246); color: rgb(147, 197, 253); }
+        .color-lanthanide { background-color: rgba(13, 148, 136, 0.2); border-color: rgb(20, 184, 166); color: rgb(153, 246, 228); }
+        .color-actinide { background-color: rgba(190, 24, 74, 0.2); border-color: rgb(244, 63, 94); color: rgb(251, 182, 206); }
+        .color-unknown { background-color: rgba(75, 85, 99, 0.2); border-color: rgb(107, 114, 128); color: rgb(209, 213, 219); }
+
+        /* 高亮與模糊效果 */
+        .element-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .element-card:hover {
+            transform: scale(1.08) translateY(-2px);
+            z-index: 30;
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.7), 0 0 15px currentColor;
+        }
+        .dimmed {
+            opacity: 0.15;
+            filter: grayscale(80%);
+        }
+        .highlighted {
+            transform: scale(1.04);
+            box-shadow: 0 0 12px currentColor;
+            z-index: 20;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col overflow-x-hidden">
+
+    <!-- 頂部導航欄 -->
+    <header class="border-b border-gray-800 bg-gray-950 px-6 py-4 flex flex-wrap justify-between items-center gap-4 sticky top-0 z-40 shadow-lg">
+        <div class="flex items-center gap-3">
+            <div class="p-2 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg shadow-md">
+                <i data-lucide="atom" class="w-8 h-8 text-white animate-spin-slow"></i>
+            </div>
+            <div>
+                <h1 class="text-xl md:text-2xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-400 tech-font">PERIODIC TABLE</h1>
+                <p class="text-xs text-gray-400">互動式元素週期表與物理/化學性質探測器</p>
+            </div>
+        </div>
+        
+        <!-- 搜尋與統計資訊 -->
+        <div class="flex items-center gap-4 w-full md:w-auto">
+            <div class="relative flex-1 md:w-64">
+                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4"></i>
+                <input type="text" id="searchInput" placeholder="搜尋名稱、符號、原子序..." class="w-full bg-gray-900 border border-gray-700 rounded-full py-1.5 pl-9 pr-4 text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all">
+            </div>
+            <button id="resetBtn" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 py-1.5 px-3 rounded-md transition border border-gray-700 flex items-center gap-1">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> 重設
+            </button>
+        </div>
+    </header>
+
+    <!-- 主要內容區 -->
+    <main class="flex-1 flex flex-col lg:flex-row p-4 md:p-6 gap-6 overflow-hidden max-w-[1800px] mx-auto w-full">
+        
+        <!-- 左側：週期表主體與分類過濾 -->
+        <div class="flex-1 flex flex-col gap-6 overflow-x-auto min-w-0">
+            
+            <!-- 分類篩選標籤 -->
+            <div class="bg-gray-950/60 p-4 rounded-xl border border-gray-800/80 shadow-md">
+                <h3 class="text-xs uppercase tracking-wider text-gray-400 font-semibold mb-3 flex items-center gap-1.5">
+                    <i data-lucide="filter" class="w-3.5 h-3.5"></i> 依族群/性質分類篩選
+                </h3>
+                <div class="flex flex-wrap gap-2 text-xs">
+                    <button class="filter-btn px-3 py-1.5 rounded-md border transition hover:brightness-125" data-group="reactive-nonmetal">
+                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 mr-1.5 align-middle"></span>非金屬
+                    </button>
+                    <button class="filter-btn px-3 py-1.5 rounded-md border transition hover:brightness-125" data-group="noble-gas">
+                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-violet-500 mr-1.5 align-middle"></span>惰性氣體
+                    </button>
+                    <button class="filter-btn px-3 py-1.5 rounded-md border transition hover:brightness-125" data-group="alkali-metal">
+                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-red-500 mr-1.5 align-middle"></span>鹼金屬
+                    </button>
+                    <button class="filter-btn px-3 py-1.5 rounded-md border transition hover:brightness-125" data-group="alkaline-earth">
+                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-orange-500 mr-1.5 align-middle"></span>鹼土金屬
+                    </button>
+                    <button class="filter-btn px-3 py-1.5 rounded-md border transition hover:brightness-125" data-group="metalloid">
+                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-500 mr-1.5 align-middle"></span>類金屬
+                    </button>
+                    <button class="filter-btn px-3 py-1.5 rounded-md border transition hover:brightness-125" data-group="post-transition">
+                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-indigo-500 mr-1.5 align-middle"></span>後過渡金屬
+                    </button>
+                    <button class="filter-btn px-3 py-1.5 rounded-md border transition hover:brightness-125" data-group="transition">
+                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-blue-500 mr-1.5 align-middle"></span>過渡金屬
+                    </button>
+                    <button class="filter-btn px-3 py-1.5 rounded-md border transition hover:brightness-125" data-group="lanthanide">
+                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-teal-500 mr-1.5 align-middle"></span>鑭系元素
+                    </button>
+                    <button class="filter-btn px-3 py-1.5 rounded-md border transition hover:brightness-125" data-group="actinide">
+                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-rose-500 mr-1.5 align-middle"></span>錒系元素
+                    </button>
+                </div>
+            </div>
+
+            <!-- 週期表網格 -->
+            <div class="relative overflow-x-auto pb-4">
+                <!-- 網格主體 18 行, 10 列 (包含鑭錒系分流) -->
+                <div class="grid grid-cols-18 gap-1.5 min-w-[1000px]" id="periodicGrid" style="grid-template-columns: repeat(18, minmax(0, 1fr));">
+                    <!-- JS 將會動態渲染元素字卡至此 -->
+                </div>
+
+                <!-- 鑭錒系（下方獨立區塊）-->
+                <div class="mt-8 pt-6 border-t border-dashed border-gray-800">
+                    <div class="grid grid-cols-18 gap-1.5 min-w-[1000px]" id="fBlockGrid" style="grid-template-columns: repeat(18, minmax(0, 1fr));">
+                        <!-- 鑭錒系字卡在此渲染 -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部圖例說明 -->
+            <div class="bg-gray-950/40 p-4 rounded-xl border border-gray-800/50 flex flex-wrap gap-6 text-xs text-gray-400 items-center justify-between">
+                <div class="flex gap-4 flex-wrap">
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 border border-gray-600 rounded bg-gray-900 flex items-center justify-center text-[8px] font-bold">1</span>原子序</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 border border-gray-600 rounded bg-gray-900 flex items-center justify-center text-[8px] font-bold">H</span>元素符號</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 border border-gray-600 rounded bg-gray-900 flex items-center justify-center text-[8px] font-bold">氫</span>中文名稱</span>
+                </div>
+                <div class="flex gap-4 flex-wrap">
+                    <span class="flex items-center gap-1.5"><i data-lucide="snowflake" class="w-3.5 h-3.5 text-blue-400"></i> 固態</span>
+                    <span class="flex items-center gap-1.5"><i data-lucide="droplet" class="w-3.5 h-3.5 text-orange-400"></i> 液態</span>
+                    <span class="flex items-center gap-1.5"><i data-lucide="wind" class="w-3.5 h-3.5 text-teal-400"></i> 氣態</span>
+                    <span class="flex items-center gap-1.5"><i data-lucide="cpu" class="w-3.5 h-3.5 text-gray-400"></i> 人工合成</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右側：元素詳細性質展示面板 -->
+        <div class="w-full lg:w-[420px] shrink-0">
+            <div id="detailPanel" class="bg-gradient-to-b from-gray-900 to-gray-950 border border-gray-800 rounded-2xl p-6 shadow-2xl sticky top-24 transition-all duration-500 overflow-hidden min-h-[500px]">
+                
+                <!-- 預設歡迎畫面 -->
+                <div id="welcomeMessage" class="h-full flex flex-col justify-center items-center text-center py-12">
+                    <div class="w-20 h-20 bg-gray-800/50 rounded-full flex items-center justify-center mb-6 border border-gray-700/60 animate-pulse">
+                        <i data-lucide="info" class="w-10 h-10 text-cyan-400"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-200 mb-2">點擊元素探索奧秘</h3>
+                    <p class="text-sm text-gray-400 px-6 leading-relaxed">請點擊週期表中的任一元素，即可在此處即時獲取其物理性質、化學性質、歷史背景與生活應用！</p>
+                </div>
+
+                <!-- 元素詳細數據展示 (預設隱藏) -->
+                <div id="elementDetail" class="hidden flex flex-col gap-6">
+                    
+                    <!-- 頂部：大字卡與中英文名 -->
+                    <div class="flex justify-between items-start border-b border-gray-800 pb-5">
+                        <div>
+                            <span id="detailCategory" class="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">分類名稱</span>
+                            <h2 class="text-3xl font-black mt-2 flex items-baseline gap-2">
+                                <span id="detailZhName" class="text-gray-100">氫</span>
+                                <span id="detailSymbol" class="text-cyan-400 font-mono tech-font text-2xl">H</span>
+                            </h2>
+                            <p id="detailEnName" class="text-xs text-gray-400 font-mono mt-1">Hydrogen</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs text-gray-500 uppercase tracking-wider font-mono">原子序 / 原子量</div>
+                            <div id="detailNumber" class="text-3xl font-extrabold text-gray-200 tech-font leading-none mt-1">1</div>
+                            <div id="detailWeight" class="text-sm font-semibold text-gray-400 mt-1 tech-font">1.008</div>
+                        </div>
+                    </div>
+
+                    <!-- 電子殼層分佈 -->
+                    <div class="bg-gray-950/60 p-3.5 rounded-xl border border-gray-800/80">
+                        <div class="flex justify-between items-center text-xs text-gray-400 mb-2">
+                            <span>電子排列方式 (各殼層數)</span>
+                            <span id="detailElectronConfig" class="font-mono text-cyan-400 font-semibold">[Xe] 4f14 5d10 6s2</span>
+                        </div>
+                        <!-- 電子分佈條形圖 -->
+                        <div id="electronShells" class="flex gap-1.5 h-3 items-end">
+                            <!-- JS 動態生成外殼層 -->
+                        </div>
+                    </div>
+
+                    <!-- Tabs 導覽：物理、化學、故事應用 -->
+                    <div class="flex border-b border-gray-800 text-sm">
+                        <button id="tabPhysicsBtn" class="flex-1 py-2 text-center border-b-2 border-cyan-500 text-cyan-400 font-medium transition">
+                            <i data-lucide="flame" class="w-4 h-4 inline mr-1 -mt-0.5"></i> 物理性質
+                        </button>
+                        <button id="tabChemistryBtn" class="flex-1 py-2 text-center border-b-2 border-transparent text-gray-400 hover:text-gray-200 font-medium transition">
+                            <i data-lucide="activity" class="w-4 h-4 inline mr-1 -mt-0.5"></i> 化學性質
+                        </button>
+                        <button id="tabStoryBtn" class="flex-1 py-2 text-center border-b-2 border-transparent text-gray-400 hover:text-gray-200 font-medium transition">
+                            <i data-lucide="sparkles" class="w-4 h-4 inline mr-1 -mt-0.5"></i> 應用故事
+                        </button>
+                    </div>
+
+                    <!-- 物理性質面板 -->
+                    <div id="tabPhysics" class="grid grid-cols-2 gap-4 text-sm animate-fade-in">
+                        <div class="bg-gray-950/40 p-3 rounded-lg border border-gray-800/50">
+                            <span class="text-xs text-gray-500 block mb-1">常溫常壓狀態</span>
+                            <div class="flex items-center gap-1.5 font-bold" id="detailState">
+                                <i data-lucide="wind" class="w-4 h-4 text-teal-400"></i> 氣體
+                            </div>
+                        </div>
+                        <div class="bg-gray-950/40 p-3 rounded-lg border border-gray-800/50">
+                            <span class="text-xs text-gray-500 block mb-1">物質密度</span>
+                            <div class="font-bold text-gray-200" id="detailDensity">0.08988 g/L</div>
+                        </div>
+                        <div class="bg-gray-950/40 p-3 rounded-lg border border-gray-800/50">
+                            <span class="text-xs text-gray-500 block mb-1">熔點</span>
+                            <div class="font-bold text-gray-200" id="detailMeltingPoint">-259.16 °C</div>
+                        </div>
+                        <div class="bg-gray-950/40 p-3 rounded-lg border border-gray-800/50">
+                            <span class="text-xs text-gray-500 block mb-1">沸點</span>
+                            <div class="font-bold text-gray-200" id="detailBoilingPoint">-252.87 °C</div>
+                        </div>
+                    </div>
+
+                    <!-- 化學性質面板 (預設隱藏) -->
+                    <div id="tabChemistry" class="grid grid-cols-2 gap-4 text-sm hidden animate-fade-in">
+                        <div class="bg-gray-950/40 p-3 rounded-lg border border-gray-800/50">
+                            <span class="text-xs text-gray-500 block mb-1">鮑林電負度</span>
+                            <div class="font-bold text-gray-200" id="detailElectronegativity">2.20</div>
+                        </div>
+                        <div class="bg-gray-950/40 p-3 rounded-lg border border-gray-800/50">
+                            <span class="text-xs text-gray-500 block mb-1">原子半徑</span>
+                            <div class="font-bold text-gray-200" id="detailAtomicRadius">53 pm</div>
+                        </div>
+                        <div class="bg-gray-950/40 p-3 rounded-lg border border-gray-800/50 col-span-2">
+                            <span class="text-xs text-gray-500 block mb-1">常見氧化態 (價態)</span>
+                            <div class="font-bold text-cyan-400" id="detailOxidationStates">-1, +1</div>
+                        </div>
+                    </div>
+
+                    <!-- 應用與故事面板 (預設隱藏) -->
+                    <div id="tabStory" class="flex flex-col gap-4 text-sm hidden animate-fade-in">
+                        <div class="bg-gray-950/40 p-4 rounded-lg border border-gray-800/50">
+                            <span class="text-xs text-gray-500 block mb-1.5 font-semibold">元素特徵描述</span>
+                            <p id="detailSummary" class="text-xs text-gray-300 leading-relaxed">氫是宇宙中最豐富、最輕的元素，恆星的主要核融合燃料。</p>
+                        </div>
+                        <div class="bg-gray-950/40 p-4 rounded-lg border border-gray-800/50">
+                            <span class="text-xs text-gray-500 block mb-1.5 font-semibold flex items-center gap-1">
+                                <i data-lucide="rocket" class="w-3.5 h-3.5 text-amber-500"></i> 生活與工業應用
+                            </span>
+                            <p id="detailApplication" class="text-xs text-gray-300 leading-relaxed">主要用於合成氨氣（肥料）、火箭燃料、加氫脫硫反應及氫燃料電池車。</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="border-t border-gray-900 bg-gray-950/80 px-6 py-4 text-center text-xs text-gray-500 mt-auto">
+        <p>© 2026 元素週期表物理化學探索平台. 本系統所載資訊均符合最新國際純粹與應用化學聯合會 (IUPAC) 標準.</p>
+    </footer>
+
+    <!-- JavaScript 邏輯 -->
+    <script>
+        // 118 元素數據庫
+        const elementsData = [
+            // 第一週期
+            { num: 1, sym: "H", name: "氫", en: "Hydrogen", group: "reactive-nonmetal", state: "gas", pos: { r: 1, c: 1 }, weight: "1.008", melt: -259.16, boil: -252.87, density: "0.08988 g/L", electronegativity: "2.20", radius: "53", oxidation: "-1, +1", summary: "宇宙中最豐富、最輕的化學元素。約占宇宙質量總數的75%。在恆星核融合中發揮核心作用。", app: "用於合成氨氣（肥料）、火箭推進劑、金屬冶煉及新一代氫燃料電池。" },
+            { num: 2, sym: "He", name: "氦", en: "Helium", group: "noble-gas", state: "gas", pos: { r: 1, c: 18 }, weight: "4.0026", melt: -272.2, boil: -268.93, density: "0.1786 g/L", electronegativity: "無", radius: "31", oxidation: "0", summary: "無色、無臭、無味的單原子惰性氣體。在宇宙中的豐度僅次於氫。", app: "氣球充氣、超導磁鐵低溫冷卻介質（如 MRI）、深海潛水呼吸混合氣。" },
+
+            // 第二週期
+            { num: 3, sym: "Li", name: "鋰", en: "Lithium", group: "alkali-metal", state: "solid", pos: { r: 2, c: 1 }, weight: "6.94", melt: 180.5, boil: 1342, density: "0.534 g/cm³", electronegativity: "0.98", radius: "167", oxidation: "+1", summary: "銀白色的鹼金屬，是密度最小、最輕的金屬固體。化學活性極強，需儲存在礦物油中。", app: "廣泛用於智慧型手機、電動車等二次鋰離子電池，也用於航太合金 and 抗憂鬱藥物。" },
+            { num: 4, sym: "Be", name: "鈹", en: "Beryllium", group: "alkaline-earth", state: "solid", pos: { r: 2, c: 2 }, weight: "9.0122", melt: 1287, boil: 2469, density: "1.85 g/cm³", electronegativity: "1.57", radius: "112", oxidation: "+2", summary: "鋼灰色的高熔點輕金屬。具高硬度、抗拉強度 and 優異的熱導性，但其粉塵具劇烈毒性。", app: "航太結構材料、X光管窗口、精密光學儀器（如韋伯太空望遠鏡的主鏡支架）。" },
+            { num: 5, sym: "B", name: "硼", en: "Boron", group: "metalloid", state: "solid", pos: { r: 2, c: 13 }, weight: "10.81", melt: 2076, boil: 3927, density: "2.34 g/cm³", electronegativity: "2.04", radius: "87", oxidation: "+3", summary: "低豐度的類金屬元素。常以硼砂等化合物存在，單質極硬且耐高溫。", app: "耐熱硼矽酸鹽玻璃（如 Pyrex 廚具）、半導體摻雜、農業微量肥料、核反應爐控制棒。" },
+            { num: 6, sym: "C", name: "碳", en: "Carbon", group: "reactive-nonmetal", state: "solid", pos: { r: 2, c: 14 }, weight: "12.011", melt: 3550, boil: 4827, density: "2.267 g/cm³", electronegativity: "2.55", radius: "67", oxidation: "-4 至 +4", summary: "生命的基本骨架元素。具有多種同素異形體，包括最硬的天然物質金剛石及導電良好的石墨。", app: "有機化學基石、鋼鐵製造、碳纖維、鉛筆芯、電極、活性碳過濾器。" },
+            { num: 7, sym: "N", name: "氮", en: "Nitrogen", group: "reactive-nonmetal", state: "gas", pos: { r: 2, c: 15 }, weight: "14.007", melt: -210, boil: -195.79, density: "1.2506 g/L", electronegativity: "3.04", radius: "56", oxidation: "-3, +3, +5", summary: "地球大氣中最主要的氣體成分（約占78%）。常溫下化學性質非常惰性，是蛋白質的組成部分。", app: "液氮超低溫冷凍、保護性包裝、製造氨水及肥料、炸藥與化妝品原料。" },
+            { num: 8, sym: "O", name: "氧", en: "Oxygen", group: "reactive-nonmetal", state: "gas", pos: { r: 2, c: 16 }, weight: "15.999", melt: -218.79, boil: -182.96, density: "1.429 g/L", electronegativity: "3.44", radius: "48", oxidation: "-2", summary: "生命呼吸不可或缺的化學元素。地殼中質量豐度最高的元素，化學活性高，易形成氧化物。", app: "醫療用氧氣、鋼鐵冶煉助燃劑、火箭液氧推進劑、水處理臭氧淨化。" },
+            { num: 9, sym: "F", name: "氟", en: "Fluorine", group: "reactive-nonmetal", state: "gas", pos: { r: 2, c: 17 }, weight: "18.998", melt: -219.67, boil: -188.11, density: "1.696 g/L", electronegativity: "3.98", radius: "42", oxidation: "-1", summary: "電負度最強、化學活性最活潑的元素。常溫下為淡黃色劇毒氣體，幾乎能與所有其他元素反應。", app: "含氟牙膏防蛀牙、不沾鍋鐵氟龍塗層、冷媒、半導體晶圓清潔與蝕刻氣體。" },
+            { num: 10, sym: "Ne", name: "氖", en: "Neon", group: "noble-gas", state: "gas", pos: { r: 2, c: 18 }, weight: "20.180", melt: -248.59, boil: -246.08, density: "0.9002 g/L", electronegativity: "無", radius: "38", oxidation: "0", summary: "極其穩定的無色惰性氣體。在低壓放電管中會發出極具穿透力的紅橙色光芒。", app: "霓虹燈廣告招牌、高壓指示燈、低溫製冷劑、氦氖雷射器。" },
+
+            // 第三週期
+            { num: 11, sym: "Na", name: "鈉", en: "Sodium", group: "alkali-metal", state: "solid", pos: { r: 3, c: 1 }, weight: "22.990", melt: 97.72, boil: 883, density: "0.968 g/cm³", electronegativity: "0.93", radius: "190", oxidation: "+1", summary: "銀白色、質地極軟的鹼金屬。遇水劇烈反應並釋放氫氣甚至燃燒爆炸。", app: "食鹽（氯化鈉）、造紙與肥皂製造工業、鈉蒸氣路燈、核反應爐液態鈉冷卻劑。" },
+            { num: 12, sym: "Mg", name: "鎂", en: "Magnesium", group: "alkaline-earth", state: "solid", pos: { r: 3, c: 2 }, weight: "24.305", melt: 650, boil: 1090, density: "1.738 g/cm³", electronegativity: "1.31", radius: "145", oxidation: "+2", summary: "亮銀色輕金屬。燃燒時會發出極耀眼的白光。是葉綠素的重要中心離子。", app: "航太與汽車的輕量化鋁鎂合金、急救強光照明彈、抗酸藥（胃藥）、煙火製造。" },
+            { num: 13, sym: "Al", name: "鋁", en: "Aluminum", group: "post-transition", state: "solid", pos: { r: 3, c: 13 }, weight: "26.982", melt: 660.32, boil: 2519, density: "2.70 g/cm³", electronegativity: "1.61", radius: "118", oxidation: "+3", summary: "地殼中含量最豐富的金屬元素。具延展性，表面易生成緻密氧化膜而有極佳的耐腐蝕性。", app: "易開罐、廚房鋁箔紙、飛機機身蒙皮、高壓電纜、建築鋁門窗窗框。" },
+            { num: 14, sym: "Si", name: "矽", en: "Silicon", group: "metalloid", state: "solid", pos: { r: 3, c: 14 }, weight: "28.085", melt: 1414, boil: 3265, density: "2.329 g/cm³", electronegativity: "1.90", radius: "111", oxidation: "-4 至 +4", summary: "具有金屬光澤的暗灰色半導體類金屬。地殼含量僅次於氧，構成沙子、石英等主要成分。", app: "積體電路（晶圓）、太陽能電池板、電腦晶片、矽橡膠防水材料、玻璃製造。" },
+            { num: 15, sym: "P", name: "磷", en: "Phosphorus", group: "reactive-nonmetal", state: "solid", pos: { r: 3, c: 15 }, weight: "30.974", melt: 44.15, boil: 280.5, density: "1.823 g/cm³", electronegativity: "2.19", radius: "98", oxidation: "-3, +3, +5", summary: "生物體 DNA 和 ATP 的核心組成元素。有多種同素異形體，如自燃性高的黃磷與較穩定的紅磷。", app: "農業化學肥料、火柴擦火皮、食品添加劑（磷酸鹽）、安全煙火。" },
+            { num: 16, sym: "S", name: "硫", en: "Sulfur", group: "reactive-nonmetal", state: "solid", pos: { r: 3, c: 16 }, weight: "32.06", melt: 115.21, boil: 444.6, density: "2.07 g/cm³", electronegativity: "2.58", radius: "88", oxidation: "-2, +4, +6", summary: "淡黃色的非金屬固體，常出現在火山及溫泉地區。燃燒會產生具刺激性氣味的二氧化硫。", app: "工業王冠之母—硫酸的製造、橡膠硫化劑、黑色火藥配方、農藥與皮膚科藥物。" },
+            { num: 17, sym: "Cl", name: "氯", en: "Chlorine", group: "reactive-nonmetal", state: "gas", pos: { r: 3, c: 17 }, weight: "35.45", melt: -101.5, boil: -34.04, density: "3.214 g/L", electronegativity: "3.16", radius: "79", oxidation: "-1, +1, +3, +5, +7", summary: "黃綠色、具強烈刺激臭味的劇毒鹵素氣體。強氧化劑，易與多數金屬直接反應。", app: "自來水與游泳池消毒、漂白劑、PVC 塑膠原料、醫用鹽水（氯化鈉）。" },
+            { num: 18, sym: "Ar", name: "氬", en: "Argon", group: "noble-gas", state: "gas", pos: { r: 3, c: 18 }, weight: "39.948", melt: -189.34, boil: -185.85, density: "1.784 g/L", electronegativity: "無", radius: "71", oxidation: "0", summary: "大氣中含量最豐富的惰性氣體（約占0.93%）。在電弧與高溫加工中極具實用性。", app: "雙層玻璃隔熱填充、不鏽鋼焊接防護罩、白熾燈泡防止燈絲氧化保護氣。" },
+
+            // 第四週期
+            { num: 19, sym: "K", name: "鉀", en: "Potassium", group: "alkali-metal", state: "solid", pos: { r: 4, c: 1 }, weight: "39.098", melt: 63.38, boil: 759, density: "0.862 g/cm³", electronegativity: "0.82", radius: "243", oxidation: "+1", summary: "極活潑的銀白色鹼金屬。維持人體內水份平衡及神經傳導的必要電解質。", app: "鉀肥、肥皂製造、煙火（紫色火焰）、食品保存。" },
+            { num: 20, sym: "Ca", name: "鈣", en: "Calcium", group: "alkaline-earth", state: "solid", pos: { r: 4, c: 2 }, weight: "40.078", melt: 842, boil: 1484, density: "1.55 g/cm³", electronegativity: "1.00", radius: "194", oxidation: "+2", summary: "銀白色的鹼土金屬，化學活性高。是骨骼、牙齒和貝殼的主要結構化學元素。", app: "水泥與混凝土建築材料、鋼鐵脫氧劑、鈣營養補充劑。" },
+            { num: 21, sym: "Sc", name: "鈧", en: "Scandium", group: "transition", state: "solid", pos: { r: 4, c: 3 }, weight: "44.956", melt: 1541, boil: 2831, density: "2.989 g/cm³", electronegativity: "1.36", radius: "184", oxidation: "+3", summary: "稀土金屬之一，銀白色，在空氣中容易變黃。", app: "鈧鋁合金（用於高端自行車架、球棒）、高強度金屬鹵化物燈。" },
+            { num: 22, sym: "Ti", name: "鈦", en: "Titanium", group: "transition", state: "solid", pos: { r: 4, c: 4 }, weight: "47.867", melt: 1668, boil: 3287, density: "4.54 g/cm³", electronegativity: "1.54", radius: "176", oxidation: "+4", summary: "具銀色光澤的過渡金屬，以高強度、低密度以及極佳的耐腐蝕性能著稱。", app: "航太發動機、人工關節與牙醫植體、高端潛水錶、二氧化鈦（鈦白粉色素）。" },
+            { num: 23, sym: "V", name: "釩", en: "Vanadium", group: "transition", state: "solid", pos: { r: 4, c: 5 }, weight: "50.942", melt: 1910, boil: 3407, density: "6.11 g/cm³", electronegativity: "1.63", radius: "171", oxidation: "+5, +4", summary: "硬度大、抗拉強度高的銀灰色金屬。在自然界中常以化合物形式廣泛存在。", app: "釩鋼合金（用於手工具、鐵軌齒輪）、液流電池（大容量儲能系統）。" },
+            { num: 24, sym: "Cr", name: "鉻", en: "Chromium", group: "transition", state: "solid", pos: { r: 4, c: 6 }, weight: "51.996", melt: 1907, boil: 2671, density: "7.15 g/cm³", electronegativity: "1.66", radius: "166", oxidation: "+3, +6", summary: "鋼灰色、具高度光澤的硬金屬。耐腐蝕，其多種化合物呈現繽紛奪目的色彩。", app: "金屬表面電鍍防鏽、不鏽鋼製造（鉻含量須大於10.5%）、顏料及皮革鞣製。" },
+            { num: 25, sym: "Mn", name: "錳", en: "Manganese", group: "transition", state: "solid", pos: { r: 4, c: 7 }, weight: "54.938", melt: 1246, boil: 2061, density: "7.44 g/cm³", electronegativity: "1.55", radius: "161", oxidation: "+2, +4, +7", summary: "質地硬而脆的灰白色金屬，外觀與鐵相似。在鋼鐵工業中具有不可替代的作用。", app: "錳鋼合金（高耐衝擊防彈裝甲）、乾電池二氧化錳正極、鋁合金硬化劑。" },
+            { num: 26, sym: "Fe", name: "鐵", en: "Iron", group: "transition", state: "solid", pos: { r: 4, c: 8 }, weight: "55.845", melt: 1538, boil: 2862, density: "7.874 g/cm³", electronegativity: "1.83", radius: "156", oxidation: "+2, +3", summary: "現代工業與建築的基石。地球地核的主要成分，也是人體血紅素攜帶氧氣的核心元素。", app: "鋼鐵冶煉（大樓結構、橋樑、汽車）、工具機、磁鐵、補鐵膳食補充劑。" },
+            { num: 27, sym: "Co", name: "鈷", en: "Cobalt", group: "transition", state: "solid", pos: { r: 4, c: 9 }, weight: "58.933", melt: 1495, boil: 2927, density: "8.86 g/cm³", electronegativity: "1.88", radius: "152", oxidation: "+2, +3", summary: "磁性的銀灰色金屬。化學上常與鎳、鐵共生。具有出色的耐熱性與硬度。", app: "鋰電池正極材料（鈷酸鋰）、超合金高溫葉片、藍色鈷玻璃顏料。" },
+            { num: 28, sym: "Ni", name: "鎳", en: "Nickel", group: "transition", state: "solid", pos: { r: 4, c: 10 }, weight: "58.693", melt: 1455, boil: 2913, density: "8.908 g/cm³", electronegativity: "1.91", radius: "149", oxidation: "+2", summary: "銀白色帶有微黃光澤的金屬。具延展性與鐵磁性，不易被空氣氧化。", app: "硬幣製造、不鏽鋼（與鉻共用）、充電式鎳氫電池、電鍍防蝕層。" },
+            { num: 29, sym: "Cu", name: "銅", en: "Copper", group: "transition", state: "solid", pos: { r: 4, c: 11 }, weight: "63.546", melt: 1084.62, boil: 2562, density: "8.96 g/cm³", electronegativity: "1.90", radius: "145", oxidation: "+1, +2", summary: "紅橘色金屬，具有極優異的導電性、導熱性。是人類最早開發利用的金屬之一。", app: "電線、印刷電路板線路、散熱器管路、青銅器與雕塑、供水管道。" },
+            { num: 30, sym: "Zn", name: "鋅", en: "Zinc", group: "transition", state: "solid", pos: { r: 4, c: 12 }, weight: "65.38", melt: 419.53, boil: 907, density: "7.14 g/cm³", electronegativity: "1.65", radius: "142", oxidation: "+2", summary: "略帶藍色的亮灰色金屬。暴露於潮濕空氣中會在表面形成抗蝕保護膜。", app: "熱浸鍍鋅防鏽、黃銅合金（與銅共熔）、乾電池外殼、防曬化妝品（氧化鋅）。" },
+            { num: 31, sym: "Ga", name: "鎵", en: "Gallium", group: "post-transition", state: "solid", pos: { r: 4, c: 13 }, weight: "69.723", melt: 29.76, boil: 2204, density: "5.91 g/cm³", electronegativity: "1.81", radius: "136", oxidation: "+3", summary: "極具特色的金屬。其熔點低於體溫（約 29.76°C），放在手掌心就會神奇地融化成液體。", app: "砷化鎵及氮化鎵半導體（用於 LED、5G 通訊、高頻晶片）、高溫溫度計填充。" },
+            { num: 32, sym: "Ge", name: "鍺", en: "Germanium", group: "metalloid", state: "solid", pos: { r: 4, c: 14 }, weight: "72.63", melt: 938.25, boil: 2833, density: "5.323 g/cm³", electronegativity: "2.01", radius: "125", oxidation: "+4", summary: "灰白色類金屬半導體，硬度大，結構類似金剛石。對紅外光具有高度折射性。", app: "紅外線夜視儀、光纖通訊網路系統、廣角相機鏡頭、部分半導體合金。" },
+            { num: 33, sym: "As", name: "砷", en: "Arsenic", group: "metalloid", state: "solid", pos: { r: 4, c: 15 }, weight: "74.922", melt: 817, boil: 614, density: "5.727 g/cm³", electronegativity: "2.18", radius: "114", oxidation: "-3, +3, +5", summary: "著名的有毒類金屬。其氧化物三氧化二砷俗稱「砒霜」。歷史上常被作為毒藥與中藥。", app: "半導體摻雜物、木材防腐劑、少數殺蟲劑、特定血癌療法的藥物組成。" },
+            { num: 34, sym: "Se", name: "硒", en: "Selenium", group: "reactive-nonmetal", state: "solid", pos: { r: 4, c: 16 }, weight: "78.971", melt: 221, boil: 685, density: "4.819 g/cm³", electronegativity: "2.55", radius: "103", oxidation: "-2, +4, +6", summary: "非金屬元素。具有特殊的光電效應：照光時的導電性比在黑暗中高出上千倍。", app: "影印機光感鼓、光電池、太陽能面板、玻璃脫色劑、微量營養素補充劑。" },
+            { num: 35, sym: "Br", name: "溴", en: "Bromine", group: "reactive-nonmetal", state: "liquid", pos: { r: 4, c: 17 }, weight: "79.904", melt: -7.2, boil: 58.8, density: "3.102 g/cm³", electronegativity: "2.96", radius: "94", oxidation: "-1, +1, +5", summary: "常溫常壓下，週期表中唯一呈液態的非金屬元素。深紅褐色液體，極易揮發出刺鼻毒氣。", app: "阻燃劑、照相膠卷感光乳劑（溴化銀）、醫藥合成、化學殺菌劑。" },
+            { num: 36, sym: "Kr", name: "氪", en: "Kr", group: "noble-gas", state: "gas", pos: { r: 4, c: 18 }, weight: "83.798", melt: -157.36, boil: -153.22, density: "3.749 g/L", electronegativity: "3.00", radius: "88", oxidation: "0", summary: "無色、無臭、無味的惰性氣體。在放電管中發出明亮的淡綠色/白色光芒。", app: "高能節能白熾燈填充、機場跑道指示燈、雷射準分子雷射器（眼睛手術）。" },
+
+            // 第五週期重點元素
+            { num: 47, sym: "Ag", name: "銀", en: "Silver", group: "transition", state: "solid", pos: { r: 5, c: 11 }, weight: "107.87", melt: 961.78, boil: 2162, density: "10.49 g/cm³", electronegativity: "1.93", radius: "165", oxidation: "+1", summary: "光澤雪白的金屬，擁有所有金屬中最高的導電率、導熱率及反射率。", app: "珠寶首飾、高精密電子導線、太陽能導電銀膠、抗菌醫療用品、照相感光材料。" },
+            { num: 50, sym: "Sn", name: "錫", en: "Tin", group: "post-transition", state: "solid", pos: { r: 5, c: 14 }, weight: "118.71", melt: 231.93, boil: 2602, density: "7.31 g/cm³", electronegativity: "1.96", radius: "145", oxidation: "+2, +4", summary: "銀白色、抗氧化力極強的金屬，質地柔軟。加熱至高溫時易氧化，熔點相對較低。", app: "電路板銲錫合金、馬口鐵（食品包裝防腐鐵罐）、青銅製造、化學藥品。" },
+            { num: 53, sym: "I", name: "碘", en: "Iodine", group: "reactive-nonmetal", state: "solid", pos: { r: 5, c: 17 }, weight: "126.90", melt: 113.7, boil: 184.3, density: "4.933 g/cm³", electronegativity: "2.66", radius: "115", oxidation: "-1, +1, +5, +7", summary: "帶有金屬光澤的紫黑色固體鹵素。加熱時不經液態直接昇華成深紫色刺激性蒸氣。", app: "醫療殺菌碘酒、防甲狀腺腫大食鹽加碘、偏光板（液晶螢幕）、人工降雨碘化銀。" },
+            { num: 54, sym: "Xe", name: "氙", en: "Xenon", group: "noble-gas", state: "gas", pos: { r: 5, c: 18 }, weight: "131.29", melt: -111.7, boil: -108.1, density: "5.894 g/L", electronegativity: "2.6", radius: "108", oxidation: "0", summary: "高密度的重惰性氣體。放電時會發出極接近自然日光、亮度極強的藍白色白光。", app: "高檔汽車氙氣大燈、相機電子閃光燈、航太離子推進器、醫學深層麻醉劑。" },
+
+            // 第六週期重點元素
+            { num: 74, sym: "W", name: "鎢", en: "Tungsten", group: "transition", state: "solid", pos: { r: 6, c: 6 }, weight: "183.84", melt: 3422, boil: 5930, density: "19.3 g/cm³", electronegativity: "2.36", radius: "162", oxidation: "+4, +6", summary: "鋼灰色或白色的極重金屬。是所有金屬中熔點最高、抗拉強度最大的王者元素。", app: "白熾燈燈絲、超硬碳化鎢刀具、穿甲彈彈芯、高溫真空爐電極、航太噴嘴。" },
+            { num: 78, sym: "Pt", name: "鉑", en: "Platinum", group: "transition", state: "solid", pos: { r: 6, c: 10 }, weight: "195.08", melt: 1768.3, boil: 3825, density: "21.45 g/cm³", electronegativity: "2.28", radius: "139", oxidation: "+2, +4", summary: "俗稱「白金」，極為稀有、沈重、抗腐蝕能力最頂尖的貴金屬之一。活性極低。", app: "汽車排氣淨化催化劑、高級珠寶、實驗室耐高溫鉑皿、抗癌化療藥物（順鉑）。" },
+            { num: 79, sym: "Au", name: "金", en: "Gold", group: "transition", state: "solid", pos: { r: 6, c: 11 }, weight: "196.97", melt: 1064.18, boil: 2856, density: "19.3 g/cm³", electronegativity: "2.54", radius: "144", oxidation: "+1, +3", summary: "亮黃色貴金屬。延展性極為逆天，可拉成極細金絲，具高度抗化學腐蝕力，自古為財富象徵。", app: "國家貨幣儲備、高檔珠寶、精密半導體晶片銲線、抗氧化電子接點。" },
+            { num: 80, sym: "Hg", name: "汞", en: "Mercury", group: "transition", state: "liquid", pos: { r: 6, c: 12 }, weight: "200.59", melt: -38.83, boil: 356.73, density: "13.534 g/cm³", electronegativity: "2.00", radius: "151", oxidation: "+1, +2", summary: "俗稱「水銀」，常溫下唯一呈液態的金屬。具高密度、劇烈毒性且極易揮發。", app: "溫度計與壓力計、日光燈及水銀開關、補牙銀粉、整流器和化學催化劑。" },
+            { num: 82, sym: "Pb", name: "鉛", en: "Lead", group: "post-transition", state: "solid", pos: { r: 6, c: 14 }, weight: "207.2", melt: 327.46, boil: 1749, density: "11.34 g/cm³", electronegativity: "2.33", radius: "146", oxidation: "+2, +4", summary: "藍灰色的重金屬。質地極軟且延展性好，具累積性人體毒性，會損害神經系統。", app: "汽車鉛酸蓄電池、防 X 光與輻射的鉛板屏障、傳統漁網配重及潛水配重。" },
+
+            // 稀土與放射性金屬代表
+            { num: 57, sym: "La", name: "鑭", en: "Lanthanum", group: "lanthanide", state: "solid", pos: { r: 8, c: 4 }, weight: "138.91", melt: 920, boil: 3464, density: "6.15 g/cm³", electronegativity: "1.10", radius: "187", oxidation: "+3", summary: "銀白色的軟金屬。鑭系元素的開端，化學性質極為活潑，會快速氧化。", app: "混合稀土金屬（打火機燧石）、高折射率光學鏡片玻璃、石油催化裂化。" },
+            { num: 92, sym: "U", name: "鈾", en: "Uranium", group: "actinide", state: "solid", pos: { r: 9, c: 6 }, weight: "238.03", melt: 1132, boil: 4131, density: "19.1 g/cm³", electronegativity: "1.38", radius: "156", oxidation: "+3 至 +6", summary: "具微弱放射性的極重金屬。高密度的晶體，易發生受激核分裂並釋放巨大能量。", app: "核能發電廠反應爐燃料（鈾-235）、軍用貧鈾穿甲彈與裝甲板、核子武器。" }
+        ];
+
+        // 智慧動態計算與建構 1 至 118 號所有元素的精確 spdf 電子能階配置（例如：[Kr] 4d¹⁰ 5s² 5p²）
+        function getSpdfConfig(z) {
+            const superscripts = {
+                '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '10': '¹⁰',
+                '11': '¹¹', '12': '¹²', '13': '¹³', '14': '¹⁴', '15': '¹⁵', '16': '¹⁶', '17': '¹⁷', '18': '¹⁸'
+            };
+
+            const format = (orb, num) => {
+                if (num <= 0) return "";
+                const numStr = String(num);
+                let sup = "";
+                for (let char of numStr) {
+                    sup += superscripts[char] || char;
+                }
+                return orb + sup;
+            };
+
+            // 包含洪德定則與亞層全滿/半滿穩定的能階異常例外元素清單
+            const exceptions = {
+                24: "[Ar] 3d⁵ 4s¹",      // Cr 鉻
+                29: "[Ar] 3d¹⁰ 4s¹",     // Cu 銅
+                41: "[Kr] 4d⁴ 5s¹",      // Nb 鈮
+                42: "[Kr] 4d⁵ 5s¹",      // Mo 鉬
+                44: "[Kr] 4d⁷ 5s¹",      // Ru 釕
+                45: "[Kr] 4d⁸ 5s¹",      // Rh 銠
+                46: "[Kr] 4d¹⁰",         // Pd 鈀 (5s軌域無電子)
+                47: "[Kr] 4d¹⁰ 5s¹",     // Ag 銀
+                57: "[Xe] 5d¹ 6s²",      // La 鑭
+                58: "[Xe] 4f¹ 5d¹ 6s²",  // Ce 鈰
+                64: "[Xe] 4f⁷ 5d¹ 6s²",  // Gd 釓
+                78: "[Xe] 4f¹⁴ 5d⁹ 6s¹", // Pt 鉑
+                79: "[Xe] 4f¹⁴ 5d¹⁰ 6s¹",// Au 金
+                89: "[Rn] 6d¹ 7s²",      // Ac 錒
+                90: "[Rn] 6d² 7s²",      // Th 釷
+                91: "[Rn] 5f² 6d¹ 7s²",  // Pa 鏷
+                92: "[Rn] 5f³ 6d¹ 7s²",  // U 鈾
+                93: "[Rn] 5f⁴ 6d¹ 7s²",  // Np 錼
+                96: "[Rn] 5f⁷ 6d¹ 7s²",  // Cm 鋦
+                103: "[Rn] 5f¹⁴ 7s² 7p¹" // Lr 鐒
+            };
+
+            if (exceptions[z]) return exceptions[z];
+
+            if (z === 1) return "1s¹";
+            if (z === 2) return "1s²";
+
+            if (z <= 10) {
+                const remaining = z - 2;
+                const s = Math.min(2, remaining);
+                const p = remaining - s;
+                return "[He] " + [format("2s", s), format("2p", p)].filter(Boolean).join(" ");
+            }
+            if (z <= 18) {
+                const remaining = z - 10;
+                const s = Math.min(2, remaining);
+                const p = remaining - s;
+                return "[Ne] " + [format("3s", s), format("3p", p)].filter(Boolean).join(" ");
+            }
+            if (z <= 36) {
+                const remaining = z - 18;
+                let s = 2;
+                let d = 0;
+                let p = 0;
+                if (remaining === 1) { s = 1; }
+                else {
+                    d = Math.min(10, remaining - 2);
+                    p = Math.max(0, remaining - 12);
+                }
+                return "[Ar] " + [format("3d", d), format("4s", s), format("4p", p)].filter(Boolean).join(" ");
+            }
+            if (z <= 54) {
+                const remaining = z - 36;
+                let s = 2;
+                let d = 0;
+                let p = 0;
+                if (remaining === 1) { s = 1; }
+                else {
+                    d = Math.min(10, remaining - 2);
+                    p = Math.max(0, remaining - 12);
+                }
+                return "[Kr] " + [format("4d", d), format("5s", s), format("5p", p)].filter(Boolean).join(" ");
+            }
+            if (z <= 86) {
+                const remaining = z - 54;
+                let s = 2;
+                let f = 0;
+                let d = 0;
+                let p = 0;
+                
+                if (remaining === 1) {
+                    s = 1;
+                } else {
+                    const afterS = remaining - 2;
+                    if (afterS > 0) {
+                        f = Math.min(14, afterS);
+                        const afterF = afterS - f;
+                        if (afterF > 0) {
+                            d = Math.min(10, afterF);
+                            p = Math.max(0, afterF - 10);
+                        }
+                    }
+                }
+                return "[Xe] " + [format("4f", f), format("5d", d), format("6s", s), format("6p", p)].filter(Boolean).join(" ");
+            }
+            if (z <= 118) {
+                const remaining = z - 86;
+                let s = 2;
+                let f = 0;
+                let d = 0;
+                let p = 0;
+
+                if (remaining === 1) {
+                    s = 1;
+                } else {
+                    const afterS = remaining - 2;
+                    if (afterS > 0) {
+                        f = Math.min(14, afterS);
+                        const afterF = afterS - f;
+                        if (afterF > 0) {
+                            d = Math.min(10, afterF);
+                            p = Math.max(0, afterF - 10);
+                        }
+                    }
+                }
+                return "[Rn] " + [format("5f", f), format("6d", d), format("7s", s), format("7p", p)].filter(Boolean).join(" ");
+            }
+            return "N/A";
+        }
+
+        // 智慧動態計算 1 至 118 號所有元素的主電子殼層數目 (K, L, M, N, O, P, Q) 用於繪製下方柱狀圖
+        function getElectronShells(z) {
+            if (z <= 2) return [z];
+            if (z <= 10) return [2, z - 2];
+            if (z <= 18) return [2, 8, z - 10];
+            if (z <= 36) { // 第 4 週期
+                if (z === 19) return [2, 8, 8, 1];
+                if (z === 20) return [2, 8, 8, 2];
+                if (z === 24) return [2, 8, 13, 1];
+                if (z === 29) return [2, 8, 18, 1];
+                if (z >= 21 && z <= 30) return [2, 8, 8 + (z - 20), 2];
+                return [2, 8, 18, z - 28];
+            }
+            if (z <= 54) { // 第 5 週期
+                if (z === 37) return [2, 8, 18, 8, 1];
+                if (z === 38) return [2, 8, 18, 8, 2];
+                if (z === 41) return [2, 8, 18, 12, 1];
+                if (z === 42) return [2, 8, 18, 13, 1];
+                if (z === 44) return [2, 8, 18, 15, 1];
+                if (z === 45) return [2, 8, 18, 16, 1];
+                if (z === 46) return [2, 8, 18, 18, 0];
+                if (z === 47) return [2, 8, 18, 18, 1];
+                if (z >= 39 && z <= 48) return [2, 8, 18, 8 + (z - 38), 2];
+                return [2, 8, 18, 18, z - 46];
+            }
+            if (z <= 86) { // 第 6 週期
+                if (z === 55) return [2, 8, 18, 18, 8, 1];
+                if (z === 56) return [2, 8, 18, 18, 8, 2];
+                if (z >= 57 && z <= 71) {
+                    const f = z - 56;
+                    if (z === 57) return [2, 8, 18, 18, 9, 2];
+                    if (z === 64) return [2, 8, 18, 25, 9, 2];
+                    if (z === 71) return [2, 8, 18, 32, 9, 2];
+                    return [2, 8, 18, 18 + f, 8, 2];
+                }
+                if (z === 78) return [2, 8, 18, 32, 17, 1];
+                if (z === 79) return [2, 8, 18, 32, 18, 1];
+                if (z >= 72 && z <= 80) return [2, 8, 18, 32, 8 + (z - 70), 2];
+                return [2, 8, 18, 32, 18, z - 78];
+            }
+            if (z <= 118) { // 第 7 週期
+                if (z === 87) return [2, 8, 18, 32, 18, 8, 1];
+                if (z === 88) return [2, 8, 18, 32, 18, 8, 2];
+                if (z >= 89 && z <= 103) {
+                    const f = z - 88;
+                    if (z === 89) return [2, 8, 18, 32, 18, 9, 2];
+                    if (z === 90) return [2, 8, 18, 32, 18, 10, 2];
+                    if (z === 91) return [2, 8, 18, 32, 20, 9, 2];
+                    if (z === 92) return [2, 8, 18, 32, 21, 9, 2];
+                    if (z === 93) return [2, 8, 18, 32, 22, 9, 2];
+                    if (z === 96) return [2, 8, 18, 32, 25, 9, 2];
+                    if (z === 103) return [2, 8, 18, 32, 32, 9, 2];
+                    return [2, 8, 18, 32, 18 + f, 8, 2];
+                }
+                if (z >= 104 && z <= 112) return [2, 8, 18, 32, 32, 8 + (z - 102), 2];
+                return [2, 8, 18, 32, 32, 18, z - 110];
+            }
+            return [2, 8];
+        }
+
+        // 用於填充沒有手寫詳細資料的剩餘佔位元素
+        function generateAll118Elements() {
+            const allElements = [];
+            const fallbackNames = {
+                37: {sym:"Rb", name:"銣", en:"Rubidium", g:"alkali-metal", st:"solid"},
+                38: {sym:"Sr", name:"鍶", en:"Strontium", g:"alkaline-earth", st:"solid"},
+                39: {sym:"Y", name:"釔", en:"Yttrium", g:"transition", st:"solid"},
+                40: {sym:"Zr", name:"鋯", en:"Zirconium", g:"transition", st:"solid"},
+                41: {sym:"Nb", name:"鈮", en:"Niobium", g:"transition", st:"solid"},
+                42: {sym:"Mo", name:"鉬", en:"Molybdenum", g:"transition", st:"solid"},
+                43: {sym:"Tc", name:"鎝", en:"Technetium", g:"transition", st:"synthetic"},
+                44: {sym:"Ru", name:"釕", en:"Ruthenium", g:"transition", st:"solid"},
+                45: {sym:"Rh", name:"銠", en:"Rhodium", g:"transition", st:"solid"},
+                46: {sym:"Pd", name:"鈀", en:"Palladium", g:"transition", st:"solid"},
+                48: {sym:"Cd", name:"鎘", en:"Cadmium", g:"transition", st:"solid"},
+                49: {sym:"In", name:"銦", en:"Indium", g:"post-transition", st:"solid"},
+                51: {sym:"Sb", name:"銻", en:"Antimony", g:"metalloid", st:"solid"},
+                52: {sym:"Te", name:"碲", en:"Tellurium", g:"metalloid", st:"solid"},
+                55: {sym:"Cs", name:"銫", en:"Cesium", g:"alkali-metal", st:"solid"},
+                56: {sym:"Ba", name:"鋇", en:"Barium", g:"alkaline-earth", st:"solid"},
+                58: {sym:"Ce", name:"鈰", en:"Cerium", g:"lanthanide", st:"solid"},
+                59: {sym:"Pr", name:"鐠", en:"Praseodymium", g:"lanthanide", st:"solid"},
+                60: {sym:"Nd", name:"釹", en:"Neodymium", g:"lanthanide", st:"solid"},
+                61: {sym:"Pm", name:"鉕", en:"Promethium", g:"lanthanide", st:"synthetic"},
+                62: {sym:"Sm", name:"釤", en:"Samarium", g:"lanthanide", st:"solid"},
+                63: {sym:"Eu", name:"銕", en:"Europium", g:"lanthanide", st:"solid"},
+                64: {sym:"Gd", name:"釓", en:"Gadolinium", g:"lanthanide", st:"solid"},
+                65: {sym:"Tb", name:"鋱", en:"Terbium", g:"lanthanide", st:"solid"},
+                66: {sym:"Dy", name:"鏑", en:"Dysprosium", g:"lanthanide", st:"solid"},
+                67: {sym:"Ho", name:"鈥", en:"Holmium", g:"lanthanide", st:"solid"},
+                68: {sym:"Er", name:"鉺", en:"Erbium", g:"lanthanide", st:"solid"},
+                69: {sym:"Tm", name:"銩", en:"Thulium", g:"lanthanide", st:"solid"},
+                70: {sym:"Yb", name:"鐿", en:"Ytterbium", g:"lanthanide", st:"solid"},
+                71: {sym:"Lu", name:"鎦", en:"Lutetium", g:"lanthanide", st:"solid"},
+                72: {sym:"Hf", name:"鉿", en:"Hafnium", g:"transition", st:"solid"},
+                73: {sym:"Ta", name:"鉭", en:"Tantalum", g:"transition", st:"solid"},
+                75: {sym:"Re", name:"", en:"Rhenium", g:"transition", st:"solid"},
+                76: {sym:"Os", name:"鋨", en:"Osmium", g:"transition", st:"solid"},
+                77: {sym:"Ir", name:"銥", en:"Iridium", g:"transition", st:"solid"},
+                81: {sym:"Tl", name:"鉈", en:"Thallium", g:"post-transition", st:"solid"},
+                83: {sym:"Bi", name:"鉍", en:"Bismuth", g:"post-transition", st:"solid"},
+                84: {sym:"Po", name:"釙", en:"Polonium", g:"metalloid", st:"solid"},
+                85: {sym:"At", name:"砈", en:"Astatine", g:"reactive-nonmetal", st:"solid"},
+                86: {sym:"Rn", name:"氡", en:"Radon", g:"noble-gas", st:"gas"},
+                87: {sym:"Fr", name:"鍅", en:"Francium", g:"alkali-metal", st:"solid"},
+                88: {sym:"Ra", name:"鐳", en:"Radium", g:"alkaline-earth", st:"solid"},
+                89: {sym:"Ac", name:"錒", en:"Actinium", g:"actinide", st:"solid"},
+                90: {sym:"Th", name:"釷", en:"Thorium", g:"actinide", st:"solid"},
+                91: {sym:"Pa", name:"鏷", en:"Protactinium", g:"actinide", st:"solid"},
+                93: {sym:"Np", name:"錼", en:"Neptunium", g:"actinide", st:"synthetic"},
+                94: {sym:"Pu", name:"鈽", en:"Plutonium", g:"actinide", st:"synthetic"},
+                95: {sym:"Am", name:"鋂", en:"Americium", g:"actinide", st:"synthetic"},
+                96: {sym:"Cm", name:"鋦", en:"Curium", g:"actinide", st:"synthetic"},
+                97: {sym:"Bk", name:"", en:"Berkelium", g:"actinide", st:"synthetic"},
+                98: {sym:"Cf", name:"鉲", en:"Californium", g:"actinide", st:"synthetic"},
+                99: {sym:"Es", name:"鑀", en:"Einsteinium", g:"actinide", st:"synthetic"},
+                100: {sym:"Fm", name:"鐨", en:"Fermium", g:"actinide", st:"synthetic"},
+                101: {sym:"Md", name:"鍆", en:"Mendelevium", g:"actinide", st:"synthetic"},
+                102: {sym:"No", name:"諾", en:"Nobelium", g:"actinide", st:"synthetic"},
+                103: {sym:"Lr", name:"鐒", en:"Lawrencium", g:"actinide", st:"synthetic"},
+                104: {sym:"Rf", name:"鑪", en:"Rutherfordium", g:"transition", st:"synthetic"},
+                105: {sym:"Db", name:"𨧀", en:"Dubnium", g:"transition", st:"synthetic"},
+                106: {sym:"Sg", name:"𨭎", en:"Seaborgium", g:"transition", st:"synthetic"},
+                107: {sym:"Bh", name:"𨨏", en:"Bohrium", g:"transition", st:"synthetic"},
+                108: {sym:"Hs", name:"𨭆", en:"Hassium", g:"transition", st:"synthetic"},
+                109: {sym:"Mt", name:"䥑", en:"Meitnerium", g:"unknown", st:"synthetic"},
+                110: {sym:"Ds", name:"鐽", en:"Darmstadtium", g:"unknown", st:"synthetic"},
+                111: {sym:"Rg", name:"錀", en:"Roentgenium", g:"unknown", st:"synthetic"},
+                112: {sym:"Cn", name:"鎶", en:"Copernicium", g:"transition", st:"synthetic"},
+                113: {sym:"Nh", name:"鉨", en:"Nihonium", g:"unknown", st:"synthetic"},
+                114: {sym:"Fl", name:"鈇", en:"Flerovium", g:"unknown", st:"synthetic"},
+                115: {sym:"Mc", name:"鏌", en:"Moscovium", g:"unknown", st:"synthetic"},
+                116: {sym:"Lv", name:"鉝", en:"Livermorium", g:"unknown", st:"synthetic"},
+                117: {sym:"Ts", name:"鿬", en:"Tennessine", g:"unknown", st:"synthetic"},
+                118: {sym:"Og", name:"鿫", en:"Oganesson", g:"unknown", st:"synthetic"}
+            };
+
+            for (let i = 1; i <= 118; i++) {
+                let found = elementsData.find(el => el.num === i);
+                if (found) {
+                    allElements.push(found);
+                } else {
+                    let meta = fallbackNames[i];
+                    if (meta) {
+                        let pos = { r: 1, c: 1 };
+                        if (i >= 19 && i <= 36) { pos = { r: 4, c: i - 18 }; }
+                        else if (i >= 37 && i <= 54) { pos = { r: 5, c: i - 36 }; }
+                        else if (i >= 55 && i <= 56) { pos = { r: 6, c: i - 54 }; }
+                        else if (i >= 72 && i <= 86) { pos = { r: 6, c: i - 71 + 3 }; }
+                        else if (i >= 87 && i <= 88) { pos = { r: 7, c: i - 86 }; }
+                        else if (i >= 104 && i <= 118) { pos = { r: 7, c: i - 103 + 3 }; }
+                        else if (i >= 57 && i <= 71) { pos = { r: 9, c: i - 57 + 4 }; } // 鑭系
+                        else if (i >= 89 && i <= 103) { pos = { r: 10, c: i - 89 + 4 }; } // 錒系
+
+                        allElements.push({
+                            num: i,
+                            sym: meta.sym,
+                            name: meta.name,
+                            en: meta.en,
+                            group: meta.g,
+                            state: meta.st,
+                            pos: pos,
+                            weight: (i * 2.3).toFixed(1),
+                            melt: 100,
+                            boil: 500,
+                            density: "資料暫缺",
+                            electronegativity: "N/A",
+                            radius: "N/A",
+                            oxidation: "N/A",
+                            summary: `${meta.name}（${meta.en}）是原子序為 ${i} 的化學元素，目前關於它的許多進階物理與化學特徵仍在密切研究與核對中。`,
+                            app: "多數用於尖端科學研究、高能物理實驗、或特定的高科技半導體材料輔助製程。"
+                        });
+                    }
+                }
+            }
+            return allElements;
+        }
+
+        const elements = generateAll118Elements();
+
+        // 建立週期表畫布
+        function renderTable() {
+            const grid = document.getElementById("periodicGrid");
+            const fGrid = document.getElementById("fBlockGrid");
+            grid.innerHTML = "";
+            fGrid.innerHTML = "";
+
+            const gridLayout = Array(7).fill(null).map(() => Array(18).fill(null));
+
+            elements.forEach(el => {
+                if (el.pos.r <= 7) {
+                    gridLayout[el.pos.r - 1][el.pos.c - 1] = el;
+                }
+            });
+
+            // 渲染標準週期表
+            for (let r = 0; r < 7; r++) {
+                for (let c = 0; c < 18; c++) {
+                    const el = gridLayout[r][c];
+                    
+                    if (el) {
+                        grid.appendChild(createElementCard(el));
+                    } else {
+                        const spacer = document.createElement("div");
+                        if (r === 5 && c === 2) {
+                            spacer.className = "flex flex-col justify-center items-center text-[10px] text-teal-400 font-bold border border-teal-800/30 bg-teal-950/10 rounded-lg p-1";
+                            spacer.innerHTML = "<span class='tech-font'>57-71</span><span>鑭系</span>";
+                        } 
+                        else if (r === 6 && c === 2) {
+                            spacer.className = "flex flex-col justify-center items-center text-[10px] text-rose-400 font-bold border border-rose-800/30 bg-rose-950/10 rounded-lg p-1";
+                            spacer.innerHTML = "<span class='tech-font'>89-103</span><span>錒系</span>";
+                        } else {
+                            spacer.className = "hidden sm:block";
+                        }
+                        grid.appendChild(spacer);
+                    }
+                }
+            }
+
+            // 渲染鑭系 (獨立於下方)
+            for (let c = 0; c < 18; c++) {
+                if (c < 3) {
+                    const spacer = document.createElement("div");
+                    spacer.className = "hidden sm:block";
+                    fGrid.appendChild(spacer);
+                } else {
+                    const el = elements.find(e => e.pos.r === 9 && e.pos.c === c + 1);
+                    if (el) fGrid.appendChild(createElementCard(el));
+                }
+            }
+            // 渲染錒系
+            for (let c = 0; c < 18; c++) {
+                if (c < 3) {
+                    const spacer = document.createElement("div");
+                    spacer.className = "hidden sm:block";
+                    fGrid.appendChild(spacer);
+                } else {
+                    const el = elements.find(e => e.pos.r === 10 && e.pos.c === c + 1);
+                    if (el) fGrid.appendChild(createElementCard(el));
+                }
+            }
+        }
+
+        // 建立單個元素卡片 DOM
+        function createElementCard(el) {
+            const card = document.createElement("div");
+            card.id = `el-${el.num}`;
+            card.className = `element-card cursor-pointer border rounded-lg p-1 flex flex-col justify-between aspect-square transition-all duration-300 color-${el.group}`;
+            card.dataset.group = el.group;
+            card.dataset.num = el.num;
+            card.dataset.search = `${el.num} ${el.sym.toLowerCase()} ${el.name} ${el.en.toLowerCase()}`;
+
+            let stateIcon = "";
+            if (el.state === "gas") stateIcon = '<i data-lucide="wind" class="w-2.5 h-2.5 opacity-80"></i>';
+            else if (el.state === "liquid") stateIcon = '<i data-lucide="droplet" class="w-2.5 h-2.5 opacity-80"></i>';
+            else if (el.state === "synthetic") stateIcon = '<i data-lucide="cpu" class="w-2.5 h-2.5 opacity-80"></i>';
+
+            card.innerHTML = `
+                <div class="flex justify-between items-start leading-none">
+                    <span class="text-[9px] font-mono font-bold opacity-85 tech-font">${el.num}</span>
+                    <span class="text-[9px] flex items-center gap-0.5">${stateIcon}</span>
+                </div>
+                <div class="text-center my-0.5">
+                    <span class="block text-sm md:text-base font-extrabold tracking-wide tech-font leading-none">${el.sym}</span>
+                    <span class="block text-[10px] md:text-xs font-medium leading-tight mt-0.5">${el.name}</span>
+                </div>
+                <div class="text-[8px] font-mono text-center opacity-70 truncate leading-none tech-font">${parseFloat(el.weight).toFixed(1)}</div>
+            `;
+
+            card.addEventListener("click", () => showDetail(el));
+            return card;
+        }
+
+        // 渲染詳細資訊
+        function showDetail(el) {
+            document.getElementById("welcomeMessage").classList.add("hidden");
+            document.getElementById("elementDetail").classList.remove("hidden");
+
+            const detailPanel = document.getElementById("detailPanel");
+            detailPanel.style.borderColor = getComputedStyle(document.getElementById(`el-${el.num}`)).borderColor;
+            
+            document.getElementById("detailZhName").innerText = el.name;
+            document.getElementById("detailSymbol").innerText = el.sym;
+            document.getElementById("detailEnName").innerText = el.en;
+            document.getElementById("detailNumber").innerText = el.num;
+            document.getElementById("detailWeight").innerText = el.weight;
+            
+            // 使用動態計算，顯示標準 [Noble] spdf 能階排列格式（例如 [Kr] 4d¹⁰ 5s² 5p²）
+            document.getElementById("detailElectronConfig").innerText = getSpdfConfig(el.num);
+            
+            const categoryNames = {
+                "reactive-nonmetal": "活潑非金屬",
+                "noble-gas": "惰性氣體",
+                "alkali-metal": "鹼金屬",
+                "alkaline-earth": "鹼土金屬",
+                "metalloid": "類金屬",
+                "post-transition": "後過渡金屬",
+                "transition": "過渡金屬",
+                "lanthanide": "鑭系元素",
+                "actinide": "錒系元素",
+                "unknown": "未明化學性質"
+            };
+            const catBadge = document.getElementById("detailCategory");
+            catBadge.innerText = categoryNames[el.group] || el.group;
+            catBadge.className = `text-[10px] font-bold px-2.5 py-0.5 rounded uppercase tracking-wider color-${el.group}`;
+
+            // 動態精準渲染主電子殼層圖表 (K, L, M, N, O, P, Q)
+            const shellsContainer = document.getElementById("electronShells");
+            shellsContainer.innerHTML = "";
+            const currentShells = getElectronShells(el.num);
+            if (currentShells && currentShells.length > 0) {
+                currentShells.forEach((electrons, index) => {
+                    const bar = document.createElement("div");
+                    bar.className = "flex-1 bg-cyan-600/30 rounded-t relative group";
+                    bar.style.height = `${(electrons / 32) * 100}%`;
+                    bar.innerHTML = `
+                        <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-gray-950 text-white text-[9px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition pointer-events-none font-mono whitespace-nowrap z-50">
+                            ${String.fromCharCode(75 + index)}層: ${electrons}
+                        </div>
+                    `;
+                    shellsContainer.appendChild(bar);
+                });
+            }
+
+            // 物理性質
+            const stateText = { "solid": "固態", "liquid": "液態", "gas": "氣態", "synthetic": "人工合成" };
+            const stateIcon = { 
+                "solid": '<i data-lucide="snowflake" class="w-4 h-4 text-blue-400"></i>', 
+                "liquid": '<i data-lucide="droplet" class="w-4 h-4 text-orange-400"></i>', 
+                "gas": '<i data-lucide="wind" class="w-4 h-4 text-teal-400"></i>', 
+                "synthetic": '<i data-lucide="cpu" class="w-4 h-4 text-gray-400"></i>' 
+            };
+            document.getElementById("detailState").innerHTML = `${stateIcon[el.state] || ""} ${stateText[el.state] || el.state}`;
+            document.getElementById("detailDensity").innerText = el.density || "未知";
+            document.getElementById("detailMeltingPoint").innerText = typeof el.melt === 'number' ? `${el.melt} °C` : "不適用";
+            document.getElementById("detailBoilingPoint").innerText = typeof el.boil === 'number' ? `${el.boil} °C` : "不適用";
+
+            // 化學性質
+            document.getElementById("detailElectronegativity").innerText = el.electronegativity || "無";
+            document.getElementById("detailAtomicRadius").innerText = el.radius ? `${el.radius} pm` : "未知";
+            document.getElementById("detailOxidationStates").innerText = el.oxidation || "未知";
+
+            // 故事與應用
+            document.getElementById("detailSummary").innerText = el.summary || "暫無詳細元素故事資訊。";
+            document.getElementById("detailApplication").innerText = el.app || "尚待工業與科學界更進一步開發其應用。";
+
+            lucide.createIcons();
+            highlightElementCard(el.num);
+        }
+
+        // 單獨高亮卡片
+        function highlightElementCard(num) {
+            document.querySelectorAll(".element-card").forEach(card => {
+                if (parseInt(card.dataset.num) === num) {
+                    card.classList.remove("dimmed");
+                    card.classList.add("highlighted");
+                } else {
+                    card.classList.add("dimmed");
+                    card.classList.remove("highlighted");
+                }
+            });
+        }
+
+        // 分類過濾邏輯
+        let activeFilter = null;
+        document.querySelectorAll(".filter-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const group = btn.dataset.group;
+                
+                if (activeFilter === group) {
+                    resetFilters();
+                } else {
+                    activeFilter = group;
+                    document.querySelectorAll(".filter-btn").forEach(b => {
+                        if (b.dataset.group === group) {
+                            b.classList.add("ring-2", "ring-white", "brightness-125");
+                        } else {
+                            b.classList.remove("ring-2", "ring-white", "brightness-125");
+                        }
+                    });
+
+                    document.querySelectorAll(".element-card").forEach(card => {
+                        if (card.dataset.group === group) {
+                            card.classList.remove("dimmed");
+                        } else {
+                            card.classList.add("dimmed");
+                        }
+                    });
+                }
+            });
+        });
+
+        // 搜尋功能
+        const searchInput = document.getElementById("searchInput");
+        searchInput.addEventListener("input", (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            if (!query) {
+                resetFilters();
+                return;
+            }
+
+            document.querySelectorAll(".element-card").forEach(card => {
+                if (card.dataset.search.includes(query)) {
+                    card.classList.remove("dimmed");
+                } else {
+                    card.classList.add("dimmed");
+                }
+            });
+        });
+
+        // 重設狀態
+        function resetFilters() {
+            activeFilter = null;
+            searchInput.value = "";
+            document.querySelectorAll(".filter-btn").forEach(b => {
+                b.classList.remove("ring-2", "ring-white", "brightness-125");
+            });
+            document.querySelectorAll(".element-card").forEach(card => {
+                card.classList.remove("dimmed", "highlighted");
+            });
+            document.getElementById("welcomeMessage").classList.remove("hidden");
+            document.getElementById("elementDetail").classList.add("hidden");
+            document.getElementById("detailPanel").style.borderColor = "#1f2937";
+        }
+        document.getElementById("resetBtn").addEventListener("click", resetFilters);
+
+        // 詳細面板之分頁切換邏輯
+        const tabPhysicsBtn = document.getElementById("tabPhysicsBtn");
+        const tabChemistryBtn = document.getElementById("tabChemistryBtn");
+        const tabStoryBtn = document.getElementById("tabStoryBtn");
+
+        const tabPhysics = document.getElementById("tabPhysics");
+        const tabChemistry = document.getElementById("tabChemistry");
+        const tabStory = document.getElementById("tabStory");
+
+        function switchTab(activeBtn, activeTab) {
+            [tabPhysicsBtn, tabChemistryBtn, tabStoryBtn].forEach(btn => {
+                btn.classList.remove("border-cyan-500", "text-cyan-400");
+                btn.classList.add("border-transparent", "text-gray-400", "hover:text-gray-200");
+            });
+            [tabPhysics, tabChemistry, tabStory].forEach(tab => {
+                tab.classList.add("hidden");
+            });
+
+            activeBtn.classList.remove("border-transparent", "text-gray-400", "hover:text-gray-200");
+            activeBtn.classList.add("border-cyan-500", "text-cyan-400");
+            activeTab.classList.remove("hidden");
+        }
+
+        tabPhysicsBtn.addEventListener("click", () => switchTab(tabPhysicsBtn, tabPhysics));
+        tabChemistryBtn.addEventListener("click", () => switchTab(tabChemistryBtn, tabChemistry));
+        tabStoryBtn.addEventListener("click", () => switchTab(tabStoryBtn, tabStory));
+
+        // 頁面加載初始化
+        window.addEventListener("DOMContentLoaded", () => {
+            renderTable();
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
