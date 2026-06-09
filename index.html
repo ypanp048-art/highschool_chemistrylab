@@ -3,313 +3,688 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChemLab VR - 虛擬化學實驗室入口平台</title>
-    <!-- Tailwind CSS CDN -->
+    <title>虛擬化學航太與實驗教育平台 - ChemHub Portal</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap');
-        
         body {
             font-family: 'Noto Sans TC', sans-serif;
-            background-color: #030712;
-            overflow-x: hidden;
+            background-color: #0b0f19;
+            color: #f3f4f6;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.07) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
         }
-
         .tech-font {
             font-family: 'Orbitron', sans-serif;
         }
-
-        /* 霓虹與微光濾鏡 */
-        .neon-glow {
-            box-shadow: 0 0 20px rgba(6, 182, 212, 0.15), inset 0 0 15px rgba(6, 182, 212, 0.05);
-        }
-        .neon-text {
-            text-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
-        }
-        
-        /* 背景動態微粒網格 */
-        @keyframes floatParticle {
-            0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 0.1; }
-            50% { opacity: 0.4; }
-            100% { transform: translateY(-100vh) scale(1.4) rotate(360deg); opacity: 0; }
-        }
-
-        .particle {
-            position: absolute;
-            bottom: -50px;
-            background: radial-gradient(circle, rgba(6, 182, 212, 0.3) 0%, rgba(6, 182, 212, 0) 70%);
-            border-radius: 50%;
-            pointer-events: none;
-        }
-
+        /* 網格與背景粒子科技感 */
         .grid-bg {
-            background-size: 50px 50px;
-            background-image: linear-gradient(to right, rgba(6, 182, 212, 0.02) 1px, transparent 1px),
-                              linear-gradient(to bottom, rgba(6, 182, 212, 0.02) 1px, transparent 1px);
+            background-image: 
+                linear-gradient(rgba(51, 65, 85, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(51, 65, 85, 0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
         }
-
-        /* 轉場淡出動畫 */
-        .fade-out-transition {
-            transition: opacity 0.5s ease, transform 0.5s ease;
-            opacity: 0;
-            transform: scale(0.98);
+        /* 毛玻璃效果 */
+        .glass-card {
+            background: rgba(21, 29, 48, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(38, 53, 84, 0.5);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover {
+            border-color: rgba(56, 189, 248, 0.4);
+            box-shadow: 0 10px 30px -10px rgba(56, 189, 248, 0.15);
+            transform: translateY(-4px);
+        }
+        /* 原子旋轉動畫 */
+        @keyframes orbitRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .atom-orbit {
+            animation: orbitRotate 12s linear infinite;
+        }
+        .atom-orbit-reverse {
+            animation: orbitRotate 8s linear infinite reverse;
+        }
+        /* 自訂滾動條 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #38bdf8;
         }
     </style>
 </head>
-<body class="text-gray-100 min-h-screen relative overflow-x-hidden grid-bg flex flex-col justify-between">
+<body class="min-h-screen flex flex-col grid-bg selection:bg-cyan-500 selection:text-slate-900">
 
-    <!-- 浮動背景粒子 -->
-    <div id="particle-container" class="absolute inset-0 pointer-events-none z-0 overflow-hidden"></div>
-
-    <!-- 頂部導覽列 -->
-    <header class="border-b border-cyan-950/50 bg-gray-950/80 backdrop-blur-md sticky top-0 z-50 px-6 py-4">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <!-- Logo -->
-            <a href="index.html" class="flex items-center space-x-3 group">
-                <div class="relative bg-cyan-950/50 p-2 rounded-xl border border-cyan-800/30 group-hover:border-cyan-500/50 transition">
-                    <i data-lucide="beaker" class="w-6 h-6 text-cyan-400"></i>
-                    <span class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-emerald-400 rounded-full animate-ping"></span>
+    <!-- 頂部導航列 -->
+    <header class="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-md border-b border-slate-800 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="relative flex items-center justify-center p-2 bg-gradient-to-tr from-cyan-500 to-emerald-400 rounded-xl shadow-lg shadow-cyan-500/20">
+                    <i data-lucide="atom" class="w-7 h-7 text-slate-950 atom-orbit"></i>
                 </div>
-                <span class="text-lg font-bold tracking-wider tech-font bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                    ChemLab <span class="text-xs bg-cyan-950 text-cyan-400 border border-cyan-800/60 px-1.5 py-0.5 rounded ml-1">VIRTUAL</span>
-                </span>
-            </a>
-            
-            <!-- 導覽選單 -->
-            <nav class="hidden md:flex items-center space-x-8 text-sm">
-                <a href="index.html" class="text-cyan-400 hover:text-cyan-300 transition flex items-center gap-1"><i data-lucide="home" class="w-4 h-4"></i> 首頁大廳</a>
-                <a href="lab.html" class="hover:text-cyan-400 transition flex items-center gap-1 transition-transform hover:translate-x-0.5"><i data-lucide="flask-conical" class="w-4 h-4"></i> 進入實驗室</a>
-                <a href="#features-section" class="hover:text-cyan-400 transition flex items-center gap-1"><i data-lucide="shield-check" class="w-4 h-4"></i> 安全規範</a>
-            </nav>
-            
-            <!-- 右側按鈕 -->
+                <div>
+                    <h1 class="text-xl font-black bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent tracking-wider tech-font">CHEMHUB PORTAL</h1>
+                    <p class="text-[10px] text-slate-400 uppercase tracking-widest tech-font">Virtual Chemistry Education Ecosystem</p>
+                </div>
+            </div>
+            <div class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
+                <a href="#modules" class="hover:text-cyan-400 transition-colors flex items-center gap-1.5"><i data-lucide="layers" class="w-4 h-4"></i> 四大核心模組</a>
+                <a href="#quick-explorer" class="hover:text-cyan-400 transition-colors flex items-center gap-1.5"><i data-lucide="search" class="w-4 h-4"></i> 元素/藥劑探索</a>
+                <a href="#safety-gate" class="hover:text-cyan-400 transition-colors flex items-center gap-1.5"><i data-lucide="shield-alert" class="w-4 h-4"></i> 安全准入挑戰</a>
+            </div>
             <div>
-                <a href="lab.html" class="px-4 py-2 bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-800/60 hover:border-cyan-500/50 text-cyan-400 text-xs font-semibold rounded-lg transition-all">
-                    啟動實驗室
-                </a>
+                <span class="text-xs bg-slate-900 border border-slate-800 text-slate-400 px-3 py-1.5 rounded-lg tech-font">SYSTEM CLOUD: ONLINE</span>
             </div>
         </div>
     </header>
 
-    <!-- 主頁面內容 -->
-    <main id="main-content" class="relative z-10 flex-grow flex flex-col justify-center items-center px-6 py-12 max-w-7xl mx-auto w-full">
-        
-        <!-- 英雄 Banner 區段 -->
-        <section class="text-center space-y-6 max-w-4xl mx-auto pt-8">
-            <div class="inline-flex items-center gap-2 bg-cyan-950/40 border border-cyan-800/40 px-4 py-1.5 rounded-full text-xs text-cyan-300 tracking-wider uppercase tech-font">
-                <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span> Safe & Educational Platform
-            </div>
-            
-            <h1 class="text-4xl md:text-6xl font-black tracking-tight leading-tight">
-                零風險探索<br>
-                <span class="bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-500 bg-clip-text text-transparent neon-text">
-                    神奇的化學反應
+    <!-- 主頁 Banner (Hero Section) -->
+    <section class="relative overflow-hidden py-16 lg:py-24 border-b border-slate-900">
+        <!-- 裝飾背景光暈 -->
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full filter blur-[100px] pointer-events-none"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-emerald-500/5 rounded-full filter blur-[100px] pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-6 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            <!-- 左側文案 -->
+            <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold text-cyan-400 bg-cyan-950/50 border border-cyan-800 rounded-full uppercase tracking-wider">
+                    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span> 高中化學 ✕ 數位實驗 ✕ 全方位探索
                 </span>
-            </h1>
-            
-            <p class="text-gray-400 text-base md:text-lg max-w-2xl mx-auto font-light leading-relaxed">
-                專為學生與科學愛好者打造的線上虛擬化學平台。無需擔心有害氣體與高溫，在精美的 3D 與模擬視覺中，自由觀察酸鹼中和、指示劑變色與金屬反應。
-            </p>
-
-            <!-- 核心導向 lab.html 按鈕 -->
-            <div class="pt-6 flex flex-col sm:flex-row justify-center items-center gap-4">
-                <a href="lab.html" id="enter-lab-btn" class="group relative px-10 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl text-black font-bold text-lg tracking-wide hover:shadow-[0_0_35px_rgba(6,182,212,0.5)] transition-all duration-300 transform hover:-translate-y-0.5 w-full sm:w-auto text-center block">
-                    <span class="flex items-center justify-center gap-2 text-slate-950">
-                        進入模擬實驗室 <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1.5 transition-transform"></i>
-                    </span>
-                    <span class="absolute -inset-0.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 opacity-25 blur group-hover:opacity-50 transition duration-300 -z-10"></span>
-                </a>
-                <a href="#features-section" class="px-10 py-4 bg-gray-900/60 border border-gray-800/80 hover:border-gray-700 rounded-xl text-gray-300 hover:text-white transition-all w-full sm:w-auto flex items-center justify-center gap-2">
-                    探索核心特色 <i data-lucide="help-circle" class="w-5 h-5"></i>
-                </a>
+                <h2 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight">
+                    開啟精彩的<br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400">化學虛擬多重宇宙</span>
+                </h2>
+                <p class="max-w-2xl text-slate-400 text-sm sm:text-base leading-relaxed mx-auto lg:mx-0">
+                    本平台完美整合了「互動實驗室」、「元素週期表」、「藥劑百科」與「安全防護網」四大核心教學模組。藉由動態數據視覺化、精準的反應引擎和即時的安全指引，提供最直觀的高中化學探索體驗。
+                </p>
+                <div class="flex flex-wrap justify-center lg:justify-start gap-4 pt-4">
+                    <a href="#modules" class="px-6 py-3.5 bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl shadow-lg shadow-cyan-500/20 transition-all duration-300 flex items-center gap-2">
+                        <i data-lucide="play-circle" class="w-5 h-5"></i> 進入探索中心
+                    </a>
+                    <a href="#quick-explorer" class="px-6 py-3.5 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 font-semibold rounded-xl transition-all duration-300 flex items-center gap-2">
+                        <i data-lucide="search" class="w-5 h-5"></i> 快速查找藥劑
+                    </a>
+                </div>
             </div>
-        </section>
 
-        <!-- 互動式化學常識看板 (安全且富教育意義) -->
-        <section class="w-full max-w-4xl mx-auto mt-20 bg-gray-900/30 border border-gray-800/60 rounded-2xl p-6 backdrop-blur-sm neon-glow">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 pb-4 border-b border-gray-800/50">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-lg bg-cyan-950/50 flex items-center justify-center border border-cyan-800/40 text-cyan-400">
-                        <i data-lucide="sparkles" class="w-5 h-5"></i>
+            <!-- 右側立體裝飾原子結構與看板 -->
+            <div class="lg:col-span-5 flex justify-center">
+                <div class="relative w-80 h-80 flex items-center justify-center">
+                    <!-- 原子軌道 A -->
+                    <div class="absolute w-72 h-32 border border-cyan-500/30 rounded-full atom-orbit transform rotate-45">
+                        <div class="absolute w-3 h-3 bg-cyan-400 rounded-full top-0 left-1/2 -translate-x-1/2 shadow-lg shadow-cyan-400/50"></div>
+                    </div>
+                    <!-- 原子軌道 B -->
+                    <div class="absolute w-72 h-32 border border-emerald-500/20 rounded-full atom-orbit-reverse transform -rotate-45">
+                        <div class="absolute w-3 h-3 bg-emerald-400 rounded-full bottom-0 left-1/2 -translate-x-1/2 shadow-lg shadow-emerald-400/50"></div>
+                    </div>
+                    <!-- 中心原子核 -->
+                    <div class="relative z-10 w-24 h-24 bg-gradient-to-tr from-cyan-600 to-emerald-500 rounded-full flex flex-col items-center justify-center border border-white/20 shadow-2xl shadow-cyan-500/30 animate-pulse">
+                        <span class="text-2xl font-black text-slate-950 tech-font">H</span>
+                        <span class="text-[8px] font-bold text-slate-900 tracking-wider">CHEM-HUB</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 平台數據展示牆 (Platform Statistics Dashboard) -->
+    <section class="bg-slate-950/60 border-b border-slate-900 py-8 px-6">
+        <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div class="p-4">
+                <div class="text-3xl font-extrabold text-cyan-400 tech-font">118</div>
+                <div class="text-xs text-slate-400 mt-1">週期表完整元素收錄</div>
+            </div>
+            <div class="p-4 border-l border-slate-800">
+                <div class="text-3xl font-extrabold text-emerald-400 tech-font">30+</div>
+                <div class="text-xs text-slate-400 mt-1">互動百科常用化學藥劑</div>
+            </div>
+            <div class="p-4 border-l border-slate-800">
+                <div class="text-3xl font-extrabold text-amber-400 tech-font">12</div>
+                <div class="text-xs text-slate-400 mt-1">標準課程與平衡反應實驗</div>
+            </div>
+            <div class="p-4 border-l border-slate-800">
+                <div class="text-3xl font-extrabold text-rose-400 tech-font">100%</div>
+                <div class="text-xs text-slate-400 mt-1">GHS 與 SDS 安全處置規範</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 四大模組卡片區 (Interactive Modules) -->
+    <section id="modules" class="py-20 max-w-7xl mx-auto px-6">
+        <div class="text-center mb-16 space-y-2">
+            <h3 class="text-3xl font-black text-slate-100 flex items-center justify-center gap-2">
+                <i data-lucide="layers" class="w-8 h-8 text-cyan-400"></i> 四大核心化學學習系統
+            </h3>
+            <p class="text-slate-400 text-sm max-w-2xl mx-auto">
+                點擊下方系統入口卡片，即刻跳轉至對應系統開始沉浸式化學實踐。
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <!-- 系統 1: 高中虛擬化學實驗室 -->
+            <div class="glass-card rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden group">
+                <div class="absolute -right-8 -top-8 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none group-hover:bg-cyan-500/20 transition-all duration-500"></div>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="p-3 bg-cyan-500/10 border border-cyan-500/30 rounded-2xl text-cyan-400">
+                            <i class="fa-solid fa-flask-vial text-2xl"></i>
+                        </div>
+                        <span class="text-xs font-bold px-2.5 py-1 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">虛擬模擬器</span>
                     </div>
                     <div>
-                        <h3 class="font-bold text-gray-100">出發前，來點化學小知識！</h3>
-                        <p class="text-xs text-gray-400">點擊下方按鈕，看看這些安全有趣的日常科學原理</p>
+                        <h4 class="text-xl font-black text-slate-100 group-hover:text-cyan-400 transition-colors">高中虛擬化學實驗室</h4>
+                        <p class="text-xs text-slate-400 mt-1 uppercase tracking-wider tech-font">Interactive Chemistry Lab</p>
                     </div>
-                </div>
-                <span class="text-xs text-cyan-400 font-mono bg-cyan-950 px-2.5 py-1 rounded-full border border-cyan-800/30">DID YOU KNOW?</span>
-            </div>
-
-            <!-- 常識內容卡片 -->
-            <div class="grid md:grid-cols-3 gap-4" id="trivia-grid">
-                <button onclick="showTrivia(0)" class="trivia-btn text-left p-4 rounded-xl bg-cyan-950/20 border border-cyan-800/20 hover:border-cyan-500/40 hover:bg-cyan-950/30 transition-all">
-                    <p class="text-xs text-cyan-400 font-bold mb-1">Q1. 紫甘藍汁會變色？</p>
-                    <p class="text-xs text-gray-400 line-clamp-2">你知道廚房裡的紫甘藍，居然可以當作天然的酸鹼指示劑嗎？</p>
-                </button>
-                <button onclick="showTrivia(1)" class="trivia-btn text-left p-4 rounded-xl bg-gray-950/40 border border-gray-900 hover:border-cyan-500/40 hover:bg-cyan-950/30 transition-all">
-                    <p class="text-xs text-teal-400 font-bold mb-1">Q2. 水是中性的嗎？</p>
-                    <p class="text-xs text-gray-400 line-clamp-2">我們平常喝的水酸鹼值大約是多少？純水在常溫下又是如何呢？</p>
-                </button>
-                <button onclick="showTrivia(2)" class="trivia-btn text-left p-4 rounded-xl bg-gray-950/40 border border-gray-900 hover:border-cyan-500/40 hover:bg-cyan-950/30 transition-all">
-                    <p class="text-xs text-amber-400 font-bold mb-1">Q3. 什麼是放熱反應？</p>
-                    <p class="text-xs text-gray-400 line-clamp-2">當酸和鹼混在一起時，為什麼燒杯的溫度會突然上升？</p>
-                </button>
-            </div>
-
-            <!-- 常識細節彈窗顯示 (利用 JS 更新) -->
-            <div id="trivia-detail" class="mt-4 p-4 bg-gray-950/60 border border-gray-800/50 rounded-xl text-sm text-gray-300 leading-relaxed min-h-[60px] flex items-center">
-                💡 點擊上方的問題，即可在出發前解鎖安全又有趣的科學小知識！
-            </div>
-        </section>
-
-        <!-- 特色介紹區段 -->
-        <section id="features-section" class="w-full mt-24 pt-16 border-t border-gray-900/80">
-            <h2 class="text-2xl md:text-3xl font-bold text-center mb-12">為何選擇 ChemLab VR 進行自主學習？</h2>
-            <div class="grid md:grid-cols-3 gap-8">
-                <!-- 卡片 1 -->
-                <div class="bg-gray-900/30 border border-gray-800/80 p-8 rounded-2xl hover:border-cyan-500/30 transition-all group">
-                    <div class="w-12 h-12 bg-cyan-950/60 border border-cyan-800/50 text-cyan-400 rounded-xl flex items-center justify-center mb-6 group-hover:scale-105 transition-transform">
-                        <i data-lucide="shield" class="w-6 h-6"></i>
-                    </div>
-                    <h3 class="text-lg font-bold mb-3 text-gray-100">100% 綠色安全保障</h3>
-                    <p class="text-gray-400 leading-relaxed text-sm">
-                        在現實中，強酸與活潑金屬反應需要嚴格配戴護目鏡。在此虛擬環境中，我們以科學精確的數值動態模擬，提供完全無害且純淨的學習平台。
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        提供高度自由的自由沙盒實驗桌與冰水浴、加熱區等物理場景。支援「酸鹼滴定曲線即時繪製」、「勒沙特列平衡移動」、「黃金雨析出」、「電化學丹尼爾電池」等11大高中課綱指標性實驗。
                     </p>
                 </div>
-                <!-- 卡片 2 -->
-                <div class="bg-gray-900/30 border border-gray-800/80 p-8 rounded-2xl hover:border-teal-500/30 transition-all group">
-                    <div class="w-12 h-12 bg-teal-950/60 border border-teal-800/50 text-teal-400 rounded-xl flex items-center justify-center mb-6 group-hover:scale-105 transition-transform">
-                        <i data-lucide="line-chart" class="w-6 h-6"></i>
-                    </div>
-                    <h3 class="text-lg font-bold mb-3 text-gray-100">實時微觀濃度計算</h3>
-                    <p class="text-gray-400 leading-relaxed text-sm">
-                        進入實驗室後，系統會動態計算離子積（如 $[H^+]$ 與 $[OH^-]$ 濃度），並以易懂的視覺化進度條呈現，將抽象課本公式化為直觀體驗。
-                    </p>
-                </div>
-                <!-- 卡片 3 -->
-                <div class="bg-gray-900/30 border border-gray-800/80 p-8 rounded-2xl hover:border-blue-500/30 transition-all group">
-                    <div class="w-12 h-12 bg-blue-950/60 border border-blue-800/50 text-blue-400 rounded-xl flex items-center justify-center mb-6 group-hover:scale-105 transition-transform">
-                        <i data-lucide="sparkles" class="w-6 h-6"></i>
-                    </div>
-                    <h3 class="text-lg font-bold mb-3 text-gray-100">啟發式趣味引導</h3>
-                    <p class="text-gray-400 leading-relaxed text-sm">
-                        不只提供無聊的數據，我們設計了經典的「酸鹼中和指示劑變色挑戰」與「氣泡置換反應」，讓自主研究、科展預習變得像遊戲一樣生動好玩！
-                    </p>
+                <div class="mt-8 pt-4 border-t border-slate-800/80 flex items-center justify-between">
+                    <span class="text-xs text-slate-500 flex items-center gap-1"><i data-lucide="database" class="w-3.5 h-3.5"></i> 含 11 組導引實驗</span>
+                    <a href="lab.html" target="_blank" class="px-5 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl text-xs flex items-center gap-1.5 transition-all">
+                        進入實驗室 <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                    </a>
                 </div>
             </div>
-        </section>
 
-    </main>
+            <!-- 系統 2: 互動式元素週期表 -->
+            <div class="glass-card rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden group">
+                <div class="absolute -right-8 -top-8 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none group-hover:bg-emerald-500/20 transition-all duration-500"></div>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-emerald-400">
+                            <i class="fa-solid fa-table-cells-large text-2xl"></i>
+                        </div>
+                        <span class="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">性質探測器</span>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-black text-slate-100 group-hover:text-emerald-400 transition-colors">互動式元素週期表</h4>
+                        <p class="text-xs text-slate-400 mt-1 uppercase tracking-wider tech-font">Periodic Table Explorer</p>
+                    </div>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        完整收錄 118 種元素。搭載「智慧型 $spdf$ 電子組態計算引擎」與「主電子殼層柱狀分佈圖表」，讓繁複的能階分配一目了然；更深度收錄每個元素的物理、化學常壓數據與豐富的歷史應用故事。
+                    </p>
+                </div>
+                <div class="mt-8 pt-4 border-t border-slate-800/80 flex items-center justify-between">
+                    <span class="text-xs text-slate-500 flex items-center gap-1"><i data-lucide="calculator" class="w-3.5 h-3.5"></i> 內建 spdf 電子組態演算</span>
+                    <a href="Periodic Table.html" target="_blank" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs flex items-center gap-1.5 transition-all">
+                        探索週期表 <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                    </a>
+                </div>
+            </div>
 
-    <!-- 底部資訊列 -->
-    <footer class="border-t border-gray-950 bg-gray-950/90 py-8 px-6 text-center text-sm text-gray-500 relative z-10">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="text-left">
-                <span class="text-base font-bold tracking-wider tech-font bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                    ChemLab VR
+            <!-- 系統 3: 藥劑百科與滴定儀 -->
+            <div class="glass-card rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden group">
+                <div class="absolute -right-8 -top-8 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl pointer-events-none group-hover:bg-amber-500/20 transition-all duration-500"></div>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="p-3 bg-amber-500/10 border border-amber-500/30 rounded-2xl text-amber-400">
+                            <i class="fa-solid fa-boxes-stacked text-2xl"></i>
+                        </div>
+                        <span class="text-xs font-bold px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">安全百科</span>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-black text-slate-100 group-hover:text-amber-400 transition-colors">藥劑百科與滴定儀</h4>
+                        <p class="text-xs text-slate-400 mt-1 uppercase tracking-wider tech-font">Reagent Cabinet & Simulator</p>
+                    </div>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        收錄多達 30 種實驗室核心安全藥劑。完美對接國際 GHS 危害警告指標與安全防護套裝（PPE）說明；並於底部獨家搭載「互動式指示劑混合儀」，可動態調配石蕊、酚酞、甲基橙等多種顯色效果。
+                    </p>
+                </div>
+                <div class="mt-8 pt-4 border-t border-slate-800/80 flex items-center justify-between">
+                    <span class="text-xs text-slate-500 flex items-center gap-1"><i data-lucide="heart-pulse" class="w-3.5 h-3.5"></i> 符合國際 GHS 規範</span>
+                    <a href="Reagent Cabinet.html" target="_blank" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs flex items-center gap-1.5 transition-all">
+                        查看藥劑櫃 <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 系統 4: 實驗室安全防護學習網 -->
+            <div class="glass-card rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden group">
+                <div class="absolute -right-8 -top-8 w-32 h-32 bg-rose-500/10 rounded-full blur-2xl pointer-events-none group-hover:bg-rose-500/20 transition-all duration-500"></div>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="p-3 bg-rose-500/10 border border-rose-500/30 rounded-2xl text-rose-400">
+                            <i class="fa-solid fa-shield-halved text-2xl"></i>
+                        </div>
+                        <span class="text-xs font-bold px-2.5 py-1 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20">安全紅線</span>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-black text-slate-100 group-hover:text-rose-400 transition-colors">實驗室安全防護學習網</h4>
+                        <p class="text-xs text-slate-400 mt-1 uppercase tracking-wider tech-font">Laboratory Safety Network</p>
+                    </div>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        「安全第一」是完成每項探究的基石。系統整合了實驗室不可逾越的核心安全守則；並搭載真實意外場景（液體噴濺、局部起火、化學傾倒）的「緊急應變流程 (SOP) 虛擬實戰演練」，培育處變不驚的應變力。
+                    </p>
+                </div>
+                <div class="mt-8 pt-4 border-t border-slate-800/80 flex items-center justify-between">
+                    <span class="text-xs text-slate-500 flex items-center gap-1"><i data-lucide="award" class="w-3.5 h-3.5"></i> 內建知識檢測測驗</span>
+                    <a href="Safety instructions.html" target="_blank" class="px-5 py-2.5 bg-rose-500 hover:bg-rose-400 text-slate-950 font-bold rounded-xl text-xs flex items-center gap-1.5 transition-all">
+                        學習安全守則 <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- 跨系統智慧搜尋器 (Universal Chem-Explorer) -->
+    <section id="quick-explorer" class="py-16 bg-slate-950/40 border-t border-slate-900">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center max-w-3xl mx-auto mb-10 space-y-2">
+                <span class="px-3 py-1 text-xs font-semibold text-cyan-400 bg-cyan-950/40 border border-cyan-800 rounded-full uppercase tracking-wider">
+                    UNIVERSAL EXPLORER
                 </span>
-                <p class="text-xs text-gray-600 mt-1">
-                    &copy; 2026 ChemLab VR 虛擬模擬實驗小組。適合青少年自主學習與探究。
+                <h3 class="text-2xl font-black text-slate-100">跨模組化學智慧搜尋器</h3>
+                <p class="text-slate-400 text-sm">
+                    在這裡輸入任何化學名詞，首頁將同時在元素週期表與藥劑百科庫中快速聯網檢索，並即時回傳屬性。
                 </p>
             </div>
-            <div class="flex space-x-6 text-xs">
-                <a href="#" class="hover:text-cyan-400 transition">使用條款</a>
-                <a href="#" class="hover:text-cyan-400 transition">隱私權政策</a>
-                <a href="lab.html" class="hover:text-cyan-400 text-cyan-400 transition font-semibold">進入實驗室</a>
+
+            <!-- 搜尋框 -->
+            <div class="max-w-2xl mx-auto relative mb-12">
+                <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5"></i>
+                <input type="text" id="universalSearchInput" onkeyup="handleUniversalSearch()" placeholder="輸入名稱、符號、化學式 (例如：Au, 鈉, H2SO4, 鹽酸)..." 
+                       class="w-full bg-slate-900 border border-slate-800 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 text-slate-100 placeholder-slate-500 text-sm rounded-2xl pl-12 pr-4 py-4 transition outline-none">
             </div>
+
+            <!-- 搜尋結果動態展示區 -->
+            <div id="searchResultArea" class="max-w-4xl mx-auto hidden transition-all duration-300">
+                <div class="glass-card rounded-2xl p-6 border-cyan-500/30">
+                    <div class="flex flex-col md:flex-row justify-between items-start border-b border-slate-800 pb-5 gap-4">
+                        <div>
+                            <span id="searchResultType" class="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-cyan-950 text-cyan-400 border border-cyan-800">元素</span>
+                            <h4 class="text-2xl font-black mt-2 flex items-baseline gap-2">
+                                <span id="searchResultName" class="text-slate-100">--</span>
+                                <span id="searchResultSymbol" class="text-cyan-400 font-mono tech-font text-xl">--</span>
+                            </h4>
+                            <p id="searchResultSub" class="text-xs text-slate-400 font-mono mt-1">--</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs text-slate-500 uppercase tracking-wider font-mono">編號 / 特徵</div>
+                            <div id="searchResultId" class="text-2xl font-extrabold text-slate-200 tech-font leading-none mt-1">--</div>
+                        </div>
+                    </div>
+
+                    <!-- 理化特性與SDS展示 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                        <div class="space-y-4">
+                            <h5 class="text-xs uppercase tracking-wider text-slate-400 font-bold flex items-center gap-1"><i data-lucide="info" class="w-3.5 h-3.5 text-cyan-400"></i> 基本理化常數</h5>
+                            <div class="grid grid-cols-2 gap-3 text-xs">
+                                <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800">
+                                    <span class="text-slate-400 block">密度：</span>
+                                    <span id="searchResultDensity" class="font-bold text-slate-200">--</span>
+                                </div>
+                                <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800">
+                                    <span class="text-slate-400 block">酸鹼屬性/電負度：</span>
+                                    <span id="searchResultAcidElec" class="font-bold text-slate-200">--</span>
+                                </div>
+                                <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800">
+                                    <span class="text-slate-400 block">熔沸點：</span>
+                                    <span id="searchResultMeltBoil" class="font-bold text-slate-200">--</span>
+                                </div>
+                                <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800">
+                                    <span class="text-slate-400 block">溶解性/狀態：</span>
+                                    <span id="searchResultSolubility" class="font-bold text-slate-200">--</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <h5 class="text-xs uppercase tracking-wider text-slate-400 font-bold flex items-center gap-1"><i data-lucide="shield" class="w-3.5 h-3.5 text-emerald-400"></i> 生產/安全/應用說明</h5>
+                            <div class="p-4 bg-slate-900/50 border border-slate-800 text-slate-300 text-xs rounded-xl leading-relaxed space-y-2">
+                                <p id="searchResultDescription">--</p>
+                                <p id="searchResultApp" class="text-slate-400 italic">--</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 預選推薦標籤 -->
+            <div class="flex flex-wrap justify-center gap-2 text-xs mt-6">
+                <span class="text-slate-500 py-1.5">熱門搜尋：</span>
+                <button onclick="fillAndSearch('Au')" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">金 (Au)</button>
+                <button onclick="fillAndSearch('H2SO4')" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">硫酸 (H₂SO₄)</button>
+                <button onclick="fillAndSearch('Na')" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">鈉 (Na)</button>
+                <button onclick="fillAndSearch('HCl')" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">鹽酸 (HCl)</button>
+                <button onclick="fillAndSearch('CuSO4')" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">硫酸銅 (CuSO₄)</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 實驗安全每日快速挑戰賽 (Daily Safety Gate Quiz) -->
+    <section id="safety-gate" class="py-20 max-w-4xl mx-auto px-6">
+        <div class="glass-card rounded-3xl p-8 border border-rose-500/30 relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-40 h-40 bg-rose-500/5 rounded-full filter blur-xl"></div>
+            
+            <div class="text-center mb-8">
+                <span class="px-3 py-1 text-xs font-semibold text-rose-400 bg-rose-950/50 border border-rose-800 rounded-full uppercase tracking-wider tech-font">
+                    LAB DOOR PASSPORT
+                </span>
+                <h3 class="text-2xl font-black text-slate-100 mt-2 flex items-center justify-center gap-2">
+                    <i data-lucide="shield-alert" class="w-6 h-6 text-rose-500 animate-pulse"></i> 實驗室每日安全准入挑戰
+                </h3>
+                <p class="text-slate-400 text-xs mt-1">進入虛擬實驗室前，需通過以下 3 題快速隨機安全考驗以解鎖「虛擬通行證」！</p>
+            </div>
+
+            <!-- 挑戰題目 -->
+            <div id="gateQuizBox" class="space-y-6">
+                <div class="flex items-center justify-between text-xs text-slate-400">
+                    <span>每日任務：正確回答安全常識</span>
+                    <span>題號：<span id="gateQuizIndex" class="font-bold text-rose-400">1</span> / 3</span>
+                </div>
+
+                <div class="bg-slate-900/60 p-5 rounded-2xl border border-slate-800">
+                    <h4 id="gateQuestionText" class="text-base font-bold text-slate-200 leading-relaxed">
+                        --
+                    </h4>
+                </div>
+
+                <div class="space-y-3" id="gateOptionsContainer">
+                    <!-- 選項 -->
+                </div>
+
+                <!-- 回饋說明與下一題 -->
+                <div id="gateFeedback" class="hidden p-4 rounded-xl text-xs leading-relaxed transition-all">
+                    <!-- 反饋文案 -->
+                </div>
+
+                <div class="flex justify-end pt-2">
+                    <button id="btnGateNext" onclick="nextGateQuestion()" disabled class="hidden px-5 py-2.5 bg-rose-500 hover:bg-rose-400 text-slate-950 font-bold rounded-xl text-xs transition-all">
+                        下一題 <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 通關成功結果 -->
+            <div id="gateResultBox" class="hidden text-center py-8 space-y-4">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-3xl mb-2">
+                    <i data-lucide="shield-check" class="w-10 h-10"></i>
+                </div>
+                <h4 class="text-xl font-bold text-slate-100">安全防護證認證完成！</h4>
+                <p class="text-xs text-slate-400 max-w-md mx-auto">
+                    恭喜您！全部題目回答正確。您已具備正確的危險警告標誌與緊急處理安全防護觀念，現在可順利通行進入實驗室！
+                </p>
+                <div class="pt-4 flex justify-center gap-4">
+                    <button onclick="resetGateQuiz()" class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs rounded-xl font-bold transition">
+                        重新測試
+                    </button>
+                    <a href="lab.html" target="_blank" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs rounded-xl font-bold transition">
+                        立即通行虛擬實驗室
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 頁尾 -->
+    <footer class="bg-slate-950 border-t border-slate-900 py-12 px-6 mt-auto text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto space-y-4">
+            <div class="flex flex-wrap justify-center gap-6 text-slate-400 text-sm">
+                <a href="#modules" class="hover:text-cyan-400 transition">探索中心</a>
+                <span>•</span>
+                <a href="#quick-explorer" class="hover:text-cyan-400 transition">化學搜尋器</a>
+                <span>•</span>
+                <a href="#safety-gate" class="hover:text-cyan-400 transition">安全准入</a>
+            </div>
+            <p>© 2026 虛擬化學教育與實驗探索平台門戶. 專為中等教育與大眾化學推廣所設計。</p>
+            <p class="text-[10px] text-slate-600 tech-font">CHEMHUB ECOSYSTEM • PORTAL CENTER v3.2</p>
         </div>
     </footer>
 
-    <!-- ========================================================= -->
-    <!-- =================== 核心 JAVASCRIPT ===================== -->
-    <!-- ========================================================= -->
+    <!-- ==================== JAVASCRIPT ==================== -->
     <script>
-        // 初始化 Lucide 圖標
-        lucide.createIcons();
+        // 1. 跨模組檢索資料庫
+        const elementsSubset = [
+            { id: "1", sym: "H", name: "氫", sub: "Hydrogen", group: "非金屬", density: "0.08988 g/L", acidElec: "2.20 (電負度)", meltBoil: "熔 -259.16°C | 沸 -252.87°C", solubility: "氣態 (不溶於水)", desc: "宇宙中豐度最高、最輕的化學元素。是恆星核融合的核心原料。", app: "工業用途：主要用於生產合成氨、火箭液態推進燃料及高潔淨氫能電池。" },
+            { id: "3", sym: "Li", name: "鋰", sub: "Lithium", group: "鹼金屬", density: "0.534 g/cm³", acidElec: "0.98 (電負度)", meltBoil: "熔 180.5°C | 沸 1342°C", solubility: "固態 (遇水緩慢放熱反應)", desc: "最輕的固體金屬，具有極強的電化學活性，必須儲存於礦物油中以防氧化。", app: "工業用途：3C 數位電子與新能源電動車鋰電池的核心關鍵材料。" },
+            { id: "11", sym: "Na", name: "鈉", sub: "Sodium", group: "鹼金屬", density: "0.968 g/cm³", acidElec: "0.93 (電負度)", meltBoil: "熔 97.72°C | 沸 883°C", solubility: "固態 (遇水劇烈放熱爆炸)", desc: "極具活性之銀白色金屬。與水反應生成強鹼氫氧化鈉與大量氫氣，並自燃發出黃色火焰。", app: "工業用途：冶金工業脫氧劑、路燈高壓鈉燈、核能冷卻載體。" },
+            { id: "26", sym: "Fe", name: "鐵", sub: "Iron", group: "過渡金屬", density: "7.874 g/cm³", acidElec: "1.83 (電負度)", meltBoil: "熔 1538°C | 沸 2862°C", solubility: "固態 (難溶於水)", desc: "現代地球文明與鋼鐵工業的骨幹。亦是人體血液血紅素運載氧分子的關鍵元素。", app: "工業用途：鋼鐵橋樑建造、車輛製造、重型機械工程。" },
+            { id: "29", sym: "Cu", name: "銅", sub: "Copper", group: "過渡金屬", density: "8.96 g/cm³", acidElec: "1.90 (電負度)", meltBoil: "熔 1084.62°C | 沸 2562°C", solubility: "固態 (不溶於水)", desc: "人類最早冶煉利用的金屬。因極優異的導電性與優美的金屬紅色光澤備受重用。", app: "工業用途：超高純度電線電纜、印刷電路板導線、青銅器與雕像原料。" },
+            { id: "47", sym: "Ag", name: "銀", sub: "Silver", group: "過渡金屬", density: "10.49 g/cm³", acidElec: "1.93 (電負度)", meltBoil: "熔 961.78°C | 沸 2162°C", solubility: "固態 (不溶於水)", desc: "擁有所有已知金屬中最高電導率、熱導率與表面反射率的貴金屬。", app: "工業用途：光電板銀漿、高端晶片焊接、珠寶首飾及物理反射鏡面。" },
+            { id: "79", sym: "Au", name: "金", sub: "Gold", group: "過渡金屬", density: "19.3 g/cm³", acidElec: "2.54 (電負度)", meltBoil: "熔 1064.18°C | 沸 2856°C", solubility: "固態 (不溶於水，僅溶於王水)", desc: "自古以來象徵財富與永恆的黃色貴金屬，具有極高延展性與極佳抗氧化性。", app: "工業用途：國際貨幣儲備、高端電子抗氧化精密接頭與半導體連線。" }
+        ];
 
-        // 1. 背景漂浮微粒動畫
-        function createParticles() {
-            const container = document.getElementById('particle-container');
-            const particleCount = 20;
+        const reagentsSubset = [
+            { id: "sulfuric_acid", sym: "H₂SO₄", name: "硫酸", sub: "Sulfuric Acid", group: "強酸性藥劑", density: "1.84 g/cm³", acidElec: "pH: 0.5 (強酸)", meltBoil: "熔 10.31°C | 沸 337°C", solubility: "與水互溶，釋放大量熱", desc: "工業之母，極具吸水性與強氧化、脫水性。稀釋時應緩緩將酸注入水中攪拌。", app: "安全指引：高度腐蝕性與脫水性，操作時務必穿戴合格防酸眼鏡與耐酸手套。" },
+            { id: "sodium_hydroxide", sym: "NaOH", name: "氫氧化鈉", sub: "Sodium Hydroxide", group: "強鹼性藥劑", density: "2.13 g/cm³", acidElec: "pH: 14.0 (強鹼)", meltBoil: "熔 318°C | 沸 1388°C", solubility: "極易溶於水，強烈放熱", desc: "白色吸濕性固體。具有極強的鹼性與蛋白水解特性，極易潮解並吸收二氧化碳。", app: "安全指引：鹼蝕性極高，對角膜與皮膚組織具破壞性灼傷。必須密封儲存。" },
+            { id: "hydrochloric_acid", sym: "HCl", name: "鹽酸", sub: "Hydrochloric Acid", group: "強酸性藥劑", density: "1.18 g/cm³", acidElec: "pH: 1.0 (強酸)", meltBoil: "熔 -30°C | 沸 108.5°C", solubility: "與水完全混溶", desc: "具強烈刺鼻窒息性氣味之強酸液體，具強烈發煙性，能與多數活性金屬反應釋出氫氣。", app: "安全指引：強發煙性，吸入酸霧會強烈刺激呼吸道與黏膜。限通風櫥操作。" },
+            { id: "copper_sulfate", sym: "CuSO₄", name: "硫酸銅", sub: "Copper Sulfate", group: "氧化/還原/鹽類", density: "2.28 g/cm³", acidElec: "pH: 4.0 (微酸)", meltBoil: "熔 110°C (失水分解)", solubility: "易溶於水，溶液呈湛藍色", desc: "外觀呈漂亮的藍色斜方斜晶體。無水物呈白色粉末，吸水迅速變藍，常作水份檢測。", app: "安全指引：具中度毒性與水生環境危害，不慎食入有害，應嚴防排入普通水體。" },
+            { id: "ethanol", sym: "C₂H₅OH", name: "乙醇 (酒精)", sub: "Ethanol", group: "通用溶劑", density: "0.789 g/cm³", acidElec: "pH: 7.0 (中性)", meltBoil: "熔 -114.1°C | 沸 78.2°C", solubility: "能與水完全混溶", desc: "無色、易揮發之易燃液體。為實驗室最常規之洗滌溶劑、萃取溶劑及消毒配方。", app: "安全指引：高度易燃性，其蒸氣與空氣易形成爆炸性混合氣。必須遠離熱源。" }
+        ];
+
+        // 搜尋處理邏輯
+        function handleUniversalSearch() {
+            const query = document.getElementById("universalSearchInput").value.trim().toLowerCase();
+            const resultArea = document.getElementById("searchResultArea");
             
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.classList.add('particle');
-                
-                // 隨機尺寸、位置、動畫延遲
-                const size = Math.random() * 60 + 20;
-                particle.style.width = `${size}px`;
-                particle.style.height = `${size}px`;
-                particle.style.left = `${Math.random() * 100}vw`;
-                
-                const duration = Math.random() * 15 + 10;
-                particle.style.animation = `floatParticle ${duration}s infinite linear`;
-                particle.style.animationDelay = `${Math.random() * -20}s`;
-                
-                container.appendChild(particle);
+            if (!query) {
+                resultArea.classList.add("hidden");
+                return;
+            }
+
+            // 先在元素表中找
+            const elementFound = elementsSubset.find(el => 
+                el.name.toLowerCase().includes(query) || 
+                el.sym.toLowerCase().includes(query) || 
+                el.sub.toLowerCase().includes(query)
+            );
+
+            // 找不到再到藥劑庫中找
+            const reagentFound = reagentsSubset.find(re => 
+                re.name.toLowerCase().includes(query) || 
+                re.sym.toLowerCase().includes(query) || 
+                re.sub.toLowerCase().includes(query)
+            );
+
+            if (elementFound) {
+                renderSearchResult(elementFound, "元素");
+            } else if (reagentFound) {
+                renderSearchResult(reagentFound, "藥劑百科");
+            } else {
+                // 顯示無結果
+                renderSearchNotFound();
             }
         }
-        createParticles();
 
-        // 2. 轉場動畫引導：當點擊進入實驗室時，播完平滑漸變動畫再跳轉到 lab.html
-        const enterLabBtn = document.getElementById('enter-lab-btn');
-        if (enterLabBtn) {
-            enterLabBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                const targetUrl = this.getAttribute('href');
-                const mainContent = document.getElementById('main-content');
-                
-                // 執行淡出動畫
-                mainContent.classList.add('fade-out-transition');
-                
-                setTimeout(() => {
-                    window.location.href = targetUrl;
-                }, 500);
-            });
+        function renderSearchResult(item, type) {
+            const resultArea = document.getElementById("searchResultArea");
+            resultArea.classList.remove("hidden");
+
+            // 類型徽章樣式
+            const typeEl = document.getElementById("searchResultType");
+            typeEl.textContent = type;
+            if (type === "元素") {
+                typeEl.className = "text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-cyan-950 text-cyan-400 border border-cyan-800";
+            } else {
+                typeEl.className = "text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-amber-950 text-amber-400 border border-amber-800";
+            }
+
+            document.getElementById("searchResultName").textContent = item.name;
+            document.getElementById("searchResultSymbol").textContent = item.sym;
+            document.getElementById("searchResultSub").textContent = `${item.sub} | 分類群：${item.group}`;
+            document.getElementById("searchResultId").textContent = item.id;
+
+            document.getElementById("searchResultDensity").textContent = item.density;
+            document.getElementById("searchResultAcidElec").textContent = item.acidElec;
+            document.getElementById("searchResultMeltBoil").textContent = item.meltBoil;
+            document.getElementById("searchResultSolubility").textContent = item.solubility;
+
+            document.getElementById("searchResultDescription").textContent = item.desc;
+            document.getElementById("searchResultApp").textContent = item.app;
         }
 
-        // 3. 趣味化學常識互動切換
-        const trivias = [
+        function renderSearchNotFound() {
+            const resultArea = document.getElementById("searchResultArea");
+            resultArea.classList.remove("hidden");
+
+            document.getElementById("searchResultName").textContent = "查無資料";
+            document.getElementById("searchResultSymbol").textContent = "?";
+            document.getElementById("searchResultSub").textContent = "請嘗試其他關鍵字";
+            document.getElementById("searchResultId").textContent = "N/A";
+
+            document.getElementById("searchResultDensity").textContent = "--";
+            document.getElementById("searchResultAcidElec").textContent = "--";
+            document.getElementById("searchResultMeltBoil").textContent = "--";
+            document.getElementById("searchResultSolubility").textContent = "--";
+
+            document.getElementById("searchResultDescription").textContent = "我們精簡的首頁搜尋器查無此化學品。建議您點選上方四大系統卡片，直接進入對應分頁（如週期表、藥劑百科）進行最完整的檢索！";
+            document.getElementById("searchResultApp").textContent = "";
+        }
+
+        function fillAndSearch(term) {
+            const input = document.getElementById("universalSearchInput");
+            input.value = term;
+            handleUniversalSearch();
+            document.getElementById("quick-explorer").scrollIntoView({ behavior: "smooth" });
+        }
+
+
+        // 2. 實驗室安全准入挑戰 (3題隨機精選安全常識)
+        const gateQuestions = [
             {
-                title: "Q1. 紫甘藍汁會變色？",
-                desc: "💡 這是真的！紫甘藍（紅椰菜）含有豐富的「花青素」，它是一種天然的酸鹼指示劑。遇到酸（如檸檬汁）會變成明亮的紅色，遇到鹼（如小蘇打水）則會轉為綠色或黃色！在我們的虛擬實驗室中，你也可以觀察到類似的奇妙指示劑變色喔！"
+                q: "1. 在稀釋強酸（例如濃硫酸）時，正確的操作方式是？",
+                opts: [
+                    "直接將水一次性倒入濃酸中攪拌",
+                    "將濃酸緩慢地沿著玻璃棒倒入水中，並不斷攪拌",
+                    "將水與濃酸在密閉燒瓶內快速混合"
+                ],
+                correct: 1,
+                explain: "正確答案：酸入水。因為濃酸溶解會放出極大的熱能，若水倒入酸中，由於水的密度小且受熱瞬間沸騰，會導致酸液劇烈向外爆濺傷害人員。"
             },
             {
-                title: "Q2. 水是絕對中性的嗎？",
-                desc: "💡 在常溫 $25^\circ\text{C}$ 下，純淨的蒸餾水酸鹼值（pH 值）剛好等於 $7.0$，呈現完全的中性。不過一般的自來水或雨水因為溶解了空氣中的二氧化碳（會形成碳酸），有時會呈現微微的弱酸性（pH 大約 $6.0 \sim 6.8$）喔！"
+                q: "2. 如果實驗時不慎將化學腐蝕性藥液濺入眼部，第一步應採取什麼行動？",
+                opts: [
+                    "用手大力揉搓眼睛，並用乾淨的餐巾紙將水擦乾",
+                    "立即到洗眼器，用手手動撥開眼瞼，以流水不閉眼沖洗最少 15 分鐘",
+                    "點幾滴消炎眼藥水並緊閉雙眼休息"
+                ],
+                correct: 1,
+                explain: "正確答案：立刻洗眼器沖洗。化學品噴灑眼部需要大量流水持續稀釋並帶走化學品，千萬不能揉眼以免造成更深度的物理與化學複合性灼傷。"
             },
             {
-                title: "Q3. 什麼是放熱反應？",
-                desc: "💡 當強酸（如鹽酸 HCl）與強鹼（如氫氧化鈉 NaOH）相遇時，會進行中和反應產生鹽和水，並釋放出化學能。這股能量會以「熱量」形式釋放，使溶液的溫度明顯上升。在實驗室中調配時一定要非常小心，而線上模擬器就是能讓你最安全體驗這種溫度變化的好地方！"
+                q: "3. 進入實驗室進行操作時，下列關於穿著規範哪一項是『正確且必須遵循』的？",
+                opts: [
+                    "為了防範毒氣，應配戴彩色隱形眼鏡",
+                    "應著拖鞋或涼鞋，確保腳部通風透氣",
+                    "必須穿著長褲、實驗衣與框架眼鏡安全鏡，禁止穿露趾拖鞋與短褲"
+                ],
+                correct: 2,
+                explain: "正確答案：必須著長褲與包鞋。隱形眼鏡會吸附化學毒性氣體並黏附在角膜上；拖鞋與短褲則會讓掉落的玻璃碎片或噴濺酸鹼液直接灼傷皮膚。"
             }
         ];
 
-        function showTrivia(index) {
-            const detailDiv = document.getElementById('trivia-detail');
-            const buttons = document.querySelectorAll('.trivia-btn');
-            
-            // 更新詳細敘述
-            detailDiv.style.opacity = '0';
-            setTimeout(() => {
-                detailDiv.innerHTML = `<div class="space-y-1">
-                    <p class="font-bold text-cyan-400 text-xs">${trivias[index].title}</p>
-                    <p class="text-xs leading-relaxed text-gray-300">${trivias[index].desc}</p>
-                </div>`;
-                detailDiv.style.opacity = '1';
-                detailDiv.style.transition = 'opacity 0.3s ease';
-            }, 150);
+        let currentGateIndex = 0;
+        let selectedGateOption = null;
 
-            // 更新按鈕樣式
-            buttons.forEach((btn, idx) => {
-                if (idx === index) {
-                    btn.className = "trivia-btn text-left p-4 rounded-xl bg-cyan-950/40 border border-cyan-500/50 hover:bg-cyan-950/50 transition-all";
+        function loadGateQuestion() {
+            const qObj = gateQuestions[currentGateIndex];
+            document.getElementById("gateQuizIndex").textContent = currentGateIndex + 1;
+            document.getElementById("gateQuestionText").textContent = qObj.q;
+
+            const optsContainer = document.getElementById("gateOptionsContainer");
+            optsContainer.innerHTML = "";
+            selectedGateOption = null;
+
+            qObj.opts.forEach((opt, idx) => {
+                const btn = document.createElement("button");
+                btn.onclick = () => selectGateOption(idx);
+                btn.id = `gate-opt-${idx}`;
+                btn.className = "w-full text-left p-4 rounded-xl border border-slate-800 bg-slate-900/40 hover:border-slate-700 hover:bg-slate-900/90 text-sm transition-all duration-200 flex items-center justify-between group";
+                btn.innerHTML = `
+                    <span>${opt}</span>
+                    <span class="w-5 h-5 rounded-full border border-slate-700 group-hover:border-cyan-500/50 flex items-center justify-center text-xs"></span>
+                `;
+                optsContainer.appendChild(btn);
+            });
+
+            document.getElementById("gateFeedback").classList.add("hidden");
+            document.getElementById("btnGateNext").classList.add("hidden");
+            document.getElementById("btnGateNext").disabled = true;
+        }
+
+        function selectGateOption(idx) {
+            if (selectedGateOption !== null) return; // 避免重複作答
+            selectedGateOption = idx;
+
+            const qObj = gateQuestions[currentGateIndex];
+            const isCorrect = idx === qObj.correct;
+            const feedbackEl = document.getElementById("gateFeedback");
+            const nextBtn = document.getElementById("btnGateNext");
+
+            // 按鈕渲染上色
+            qObj.opts.forEach((opt, oIdx) => {
+                const btn = document.getElementById(`gate-opt-${oIdx}`);
+                btn.disabled = true;
+                if (oIdx === qObj.correct) {
+                    btn.className = "w-full text-left p-4 rounded-xl border border-emerald-500 bg-emerald-950/20 text-emerald-300 text-sm flex items-center justify-between";
+                    btn.querySelector("span:last-child").innerHTML = `<i class="fa-solid fa-check text-emerald-400"></i>`;
+                } else if (oIdx === idx) {
+                    btn.className = "w-full text-left p-4 rounded-xl border border-rose-500 bg-rose-950/20 text-rose-300 text-sm flex items-center justify-between";
+                    btn.querySelector("span:last-child").innerHTML = `<i class="fa-solid fa-xmark text-rose-400"></i>`;
                 } else {
-                    btn.className = "trivia-btn text-left p-4 rounded-xl bg-gray-950/40 border border-gray-900 hover:border-cyan-500/40 hover:bg-cyan-950/30 transition-all";
+                    btn.className = "w-full text-left p-4 rounded-xl border border-slate-900 bg-slate-950/30 text-slate-600 text-sm flex items-center justify-between cursor-not-allowed";
                 }
             });
+
+            // 反饋面板
+            feedbackEl.classList.remove("hidden");
+            if (isCorrect) {
+                feedbackEl.className = "p-4 rounded-xl text-xs leading-relaxed transition-all bg-emerald-950/20 border border-emerald-500/30 text-emerald-400";
+                feedbackEl.innerHTML = `<strong>🎉 回答正確！</strong> <p class="mt-1">${qObj.explain}</p>`;
+            } else {
+                feedbackEl.className = "p-4 rounded-xl text-xs leading-relaxed transition-all bg-rose-950/20 border border-rose-500/30 text-rose-400";
+                feedbackEl.innerHTML = `<strong>⚠️ 答錯囉！</strong> <p class="mt-1">${qObj.explain}</p>`;
+            }
+
+            nextBtn.classList.remove("hidden");
+            nextBtn.disabled = false;
         }
+
+        function nextGateQuestion() {
+            if (currentGateIndex < gateQuestions.length - 1) {
+                currentGateIndex++;
+                loadGateQuestion();
+            } else {
+                // 全部答完
+                document.getElementById("gateQuizBox").classList.add("hidden");
+                document.getElementById("gateResultBox").classList.remove("hidden");
+            }
+        }
+
+        function resetGateQuiz() {
+            currentGateIndex = 0;
+            document.getElementById("gateResultBox").classList.add("hidden");
+            document.getElementById("gateQuizBox").classList.remove("hidden");
+            loadGateQuestion();
+        }
+
+        // 初始化
+        window.addEventListener("DOMContentLoaded", () => {
+            lucide.createIcons();
+            loadGateQuestion();
+        });
     </script>
 </body>
 </html>
