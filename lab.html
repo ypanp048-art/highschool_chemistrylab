@@ -664,6 +664,7 @@
                 electrolysisActive: false, // 電解槽是否運作
                 silverMirrorPercent: 0, // 銀鏡反應程度
                 organicPhase: false, // 是否雙相分層
+                esterProduced: false, // 是否已產生乙酸乙酯
                 yellowRainState: 'none', // none, precipitate, dissolved, golden_crystals
                 color: 'rgba(255, 255, 255, 0.1)' // 液體外觀顏色
             };
@@ -701,10 +702,26 @@
                 wrapper.style.top = `${inst.y}px`;
                 wrapper.style.zIndex = activeInstrument && activeInstrument.id === inst.id ? '50' : '10';
 
+                // 當選中儀器時，在儀器上方動態注入控制快捷鍵：洗滌與回收功能
+                let controlPanelHTML = '';
+                if (activeInstrument && activeInstrument.id === inst.id) {
+                    controlPanelHTML = `
+                        <div class="absolute -top-8 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-slate-800/90 border border-slate-700 p-0.5 rounded-md shadow-md z-30 pointer-events-auto">
+                            <button class="btn-wash bg-cyan-600 hover:bg-cyan-500 text-white text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1 transition" title="清空儀器內試劑">
+                                <i class="fa-solid fa-broom text-[8px]"></i>清空
+                            </button>
+                            <button class="btn-delete bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1 transition" title="回收移除此儀器">
+                                <i class="fa-solid fa-trash-can text-[8px]"></i>回收
+                            </button>
+                        </div>
+                    `;
+                }
+
                 // 生成該儀器的專屬 UI 內容
                 let contentHTML = '';
                 if (inst.type === 'beaker') {
                     contentHTML = `
+                        ${controlPanelHTML}
                         <div class="relative w-28 h-32 border-4 border-slate-300/70 border-t-0 rounded-b-xl flex flex-col justify-end overflow-hidden bg-white/10 backdrop-blur-xs">
                             <!-- 刻度 -->
                             <div class="absolute left-2 top-4 text-[8px] text-slate-400 flex flex-col gap-2.5">
@@ -713,17 +730,19 @@
                                 <span>- 100ml</span>
                                 <span>- 50ml</span>
                             </div>
-                            <!-- 液體層 (支援雙相分層物理) -->
+                            <!-- 液體層 (支援雙相分層與酯化反應浮層物理) -->
                             <div class="w-full relative flex flex-col-reverse justify-start transition-all" style="height: ${(inst.volume / inst.maxVolume) * 100}%">
                                 <!-- 水相下層 (或混合層) -->
                                 <div class="w-full liquid-layer relative" style="height: ${inst.organicPhase ? '50%' : '100%'}; background-color: ${inst.color}">
                                     <!-- 沉澱物渲染 -->
-                                    ${inst.precipitate !== "無明顯沉澱" ? `<div class="absolute bottom-0 w-full h-3 ${inst.yellowRainState === 'golden_crystals' ? 'bg-yellow-300 animate-pulse' : (inst.precipitate.includes('黃色') ? 'bg-yellow-400' : (inst.precipitate.includes('銀') ? 'bg-slate-300' : 'bg-slate-100'))} opacity-90 rounded-b-lg"></div>` : ''}
+                                    ${inst.precipitate !== "無明顯沉澱" && !inst.esterProduced ? `<div class="absolute bottom-0 w-full h-3 ${inst.yellowRainState === 'golden_crystals' ? 'bg-yellow-300 animate-pulse' : (inst.precipitate.includes('黃色') ? 'bg-yellow-400' : (inst.precipitate.includes('銀') ? 'bg-slate-300' : 'bg-slate-100'))} opacity-90 rounded-b-lg"></div>` : ''}
                                     <!-- 劇烈氣泡動畫 -->
                                     ${inst.heating || inst.precipitate.includes('氣泡') ? '<div class="bubble w-2 h-2" style="left: 20%; animation-delay: 0.1s"></div><div class="bubble w-3 h-3" style="left: 50%; animation-delay: 0.4s"></div><div class="bubble w-1.5 h-1.5" style="left: 80%; animation-delay: 0.7s"></div>' : ''}
                                 </div>
-                                <!-- 有機相上層 -->
-                                ${inst.organicPhase ? `<div class="w-full liquid-layer relative" style="height: 50%; background-color: ${inst.reagents['iodine_solution'] ? 'rgba(147, 51, 234, 0.45)' : 'rgba(14, 116, 144, 0.15)'}"></div>` : ''}
+                                <!-- 有機相上層 (正己烷相 or 乙酸乙酯酯層) -->
+                                ${inst.organicPhase ? `<div class="w-full liquid-layer relative" style="height: 50%; background-color: ${inst.esterProduced ? 'rgba(255, 255, 255, 0.25)' : (inst.reagents['iodine_solution'] ? 'rgba(147, 51, 234, 0.45)' : 'rgba(14, 116, 144, 0.15)')}" title="${inst.esterProduced ? '上層：乙酸乙酯油層' : '上層：有機相'}">
+                                    ${inst.esterProduced ? '<div class="absolute inset-0 flex items-center justify-center text-[8px] text-white/60 font-semibold select-none">乙酸乙酯層</div>' : ''}
+                                </div>` : ''}
                             </div>
                             <!-- 溫度計與pH探針插圖 -->
                             <div class="absolute right-2 top-2 flex flex-col gap-1 items-end opacity-60">
@@ -742,6 +761,7 @@
                         tubeBg = `bg-gradient-to-b from-slate-300 via-slate-100 to-slate-400`;
                     }
                     contentHTML = `
+                        ${controlPanelHTML}
                         <div class="relative w-12 h-32 border-4 ${borderStyle} border-t-0 rounded-b-full flex flex-col justify-end overflow-hidden ${tubeBg} backdrop-blur-xs">
                             <!-- 液體層 -->
                             <div class="w-full relative transition-all" style="height: ${(inst.volume / inst.maxVolume) * 100}%; background-color: ${inst.color}">
@@ -753,6 +773,7 @@
                     `;
                 } else if (inst.type === 'burette') {
                     contentHTML = `
+                        ${controlPanelHTML}
                         <div class="relative flex flex-col items-center">
                             <!-- 滴定管支架 -->
                             <div class="absolute left-1/2 -translate-x-1/2 -top-10 w-1 bg-slate-600 h-48 -z-10"></div>
@@ -773,6 +794,7 @@
                     `;
                 } else if (inst.type === 'bunsen') {
                     contentHTML = `
+                        ${controlPanelHTML}
                         <div class="relative w-20 h-28 flex flex-col items-center justify-end">
                             <!-- 點火火焰 -->
                             ${inst.flameOn ? `
@@ -794,6 +816,7 @@
                     `;
                 } else if (inst.type === 'daniell_kit') {
                     contentHTML = `
+                        ${controlPanelHTML}
                         <div class="relative w-44 h-28 border border-slate-400 bg-slate-900/40 rounded-lg p-2 flex gap-2 justify-between items-end">
                             <!-- 左槽 (鋅半電池) -->
                             <div class="w-1/2 h-20 border-2 border-slate-300 rounded relative flex flex-col justify-end overflow-hidden bg-white/5">
@@ -818,6 +841,7 @@
                     `;
                 } else if (inst.type === 'electrolysis_kit') {
                     contentHTML = `
+                        ${controlPanelHTML}
                         <div class="relative w-40 h-28 border border-slate-400 bg-slate-900/40 rounded-lg p-2 flex flex-col justify-end overflow-hidden">
                             <!-- 電池與導線插圖 -->
                             <div class="absolute top-1 left-1/2 -translate-x-1/2 bg-slate-800 text-[8px] text-yellow-400 px-1.5 py-0.5 rounded border border-slate-600 flex items-center gap-1">
@@ -837,6 +861,42 @@
                 container.appendChild(wrapper);
 
                 // --- 註冊事件監聽器 ---
+                
+                // 洗滌/清空儀器試劑按鈕
+                const washBtn = wrapper.querySelector('.btn-wash');
+                if (washBtn) {
+                    washBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        inst.reagents = {};
+                        inst.volume = 0;
+                        inst.ph = 7.00;
+                        inst.precipitate = "無明顯沉澱";
+                        inst.organicPhase = false;
+                        inst.yellowRainState = 'none';
+                        inst.silverMirrorPercent = 0;
+                        inst.esterProduced = false;
+                        inst.color = 'rgba(255, 255, 255, 0.1)';
+                        writeLog(`🧹 已清洗並清空 ${getInstrumentName(inst.type)} 內的所有化學試劑與殘餘物。`, "info");
+                        renderInstruments();
+                        updateSensors();
+                    });
+                }
+
+                // 回收移除儀器按鈕
+                const deleteBtn = wrapper.querySelector('.btn-delete');
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        writeLog(`🗑️ 已回收並移除了 ${getInstrumentName(inst.type)}。`, "info");
+                        instruments = instruments.filter(i => i.id !== inst.id);
+                        if (activeInstrument && activeInstrument.id === inst.id) {
+                            activeInstrument = null;
+                        }
+                        renderInstruments();
+                        updateSensors();
+                    });
+                }
+
                 // 本生燈點火/開關
                 const bunsenBtn = wrapper.querySelector('.btn-bunsen-switch');
                 if (bunsenBtn) {
@@ -875,7 +935,7 @@
 
                 // 點擊選擇當前操作儀器
                 wrapper.addEventListener('mousedown', (e) => {
-                    if (e.target.tagName === 'BUTTON') return;
+                    if (e.target.closest('button')) return; // 避免點擊按鈕觸發拖曳
                     setActiveInstrument(inst);
                     dragTarget = inst;
                     const rect = wrapper.getBoundingClientRect();
@@ -900,6 +960,7 @@
                     }
                 }
             });
+            renderInstruments(); // 重新渲染以便顯示所屬的 🧹/🗑️ 控制欄
             updateSensors();
         }
 
@@ -1116,9 +1177,9 @@
                 writeLog("🫧 金屬鋅與酸進行置換反應！產生了 [H₂ (氫氣)] 氣體與 ZnCl₂ 鹽類！", "success");
             }
 
-            // 10. 有機酯化反應 (ethanol + CH3COOH + H2SO4)
-            if (r['ethanol'] && r['CH3COOH'] && r['H2SO4']) {
-                writeLog("🍍 乙醇與醋酸在高溫催化下進行脫水酯化！產生了具有水果香味的 [乙酸乙酯 (酯類)] 物質！", "success");
+            // 10. 有機酯化反應原料混合提示 (乙酸乙酯前驅物)
+            if (r['ethanol'] && r['CH3COOH'] && r['H2SO4'] && !inst.esterProduced) {
+                writeLog("🧪 儀器內已成功混合乙醇、醋酸與濃硫酸催化劑。請將本生燈拖入下方並「點火加熱」至 70°C 以上，以啟動酯化合成反應！", "warning");
             }
 
             // 11. 阿斯匹靈合成 (salicylic_acid + acetic_anhydride + H2SO4)
@@ -1193,6 +1254,17 @@
                         stateChanged = true;
 
                         // 特殊高溫化學反應
+                        
+                        // 有機酯化反應高溫判定 (乙酸乙酯)
+                        if (inst.reagents['ethanol'] && inst.reagents['CH3COOH'] && inst.reagents['H2SO4']) {
+                            if (inst.temp >= 70 && !inst.esterProduced) {
+                                inst.esterProduced = true;
+                                inst.organicPhase = true; // 出現油水分層
+                                inst.precipitate = "產生無色芳香酯類 (乙酸乙酯)";
+                                writeLog("🍍 乙醇與醋酸在濃硫酸催化及高溫加熱下，進行脫水酯化反應！產生了具有芳香水果味的 [乙酸乙酯 (酯類)] 與 [水] 物質！上層浮現出無色油狀酯層。", "success");
+                            }
+                        }
+
                         // 銀鏡反應加熱判定
                         if (inst.type === 'testtube' && inst.reagents['AgNO3'] && inst.reagents['NH3_aq'] && inst.reagents['ethanol']) {
                             if (inst.temp >= 60 && inst.silverMirrorPercent < 100) {
