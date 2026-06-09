@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChemLab VR - 線上虛擬化學實驗室</title>
+    <title>ChemLab VR - 線上虛擬化學實驗室入口網站</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
@@ -47,30 +47,6 @@
             pointer-events: none;
         }
 
-        /* 燒杯液體波動動畫 */
-        @keyframes wave {
-            0%, 100% { transform: translateY(0) scaleY(1); }
-            50% { transform: translateY(-4px) scaleY(1.02); }
-        }
-        .liquid-wave {
-            animation: wave 4s ease-in-out infinite;
-        }
-
-        /* 氣泡上升動畫 */
-        @keyframes bubbleUp {
-            0% { transform: translateY(100%) scale(0.3); opacity: 0; }
-            50% { opacity: 0.8; }
-            100% { transform: translateY(-120px) scale(1.2); opacity: 0; }
-        }
-        .bubble {
-            animation: bubbleUp 2s infinite ease-in;
-        }
-
-        /* 頁面流暢轉場 */
-        .page-transition {
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
         /* 實驗室裝飾網格 */
         .grid-bg {
             background-size: 40px 40px;
@@ -79,433 +55,147 @@
         }
     </style>
 </head>
-<body class="text-gray-100 min-height-screen relative overflow-x-hidden grid-bg">
+<body class="text-gray-100 min-h-screen relative overflow-x-hidden grid-bg flex flex-col justify-between">
 
     <!-- 浮動化學微粒背景 -->
     <div id="particle-container" class="absolute inset-0 pointer-events-none z-0 overflow-hidden"></div>
 
-    <!-- 頁面容器 (包含入口頁與實驗室頁) -->
-    <div class="relative z-10 w-full min-h-screen flex flex-col justify-between">
+    <!-- 頂部導覽列 -->
+    <header class="border-b border-cyan-900/40 bg-gray-950/70 backdrop-blur-md sticky top-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="index.html" class="flex items-center space-x-3 cursor-pointer">
+                <div class="relative">
+                    <i data-lucide="beaker" class="w-8 h-8 text-cyan-400 animate-pulse"></i>
+                    <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping"></span>
+                </div>
+                <span class="text-xl font-bold tracking-wider tech-font bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+                    ChemLab <span class="text-xs bg-cyan-950 text-cyan-400 border border-cyan-800 px-1.5 py-0.5 rounded ml-1">VR v2.5</span>
+                </span>
+            </a>
+            <nav class="hidden md:flex space-x-8 text-sm">
+                <a href="index.html" class="hover:text-cyan-400 transition flex items-center gap-1"><i data-lucide="home" class="w-4 h-4"></i> 首頁大廳</a>
+                <a href="lab.html" class="text-cyan-400 hover:text-cyan-300 transition flex items-center gap-1"><i data-lucide="flask-conical" class="w-4 h-4"></i> 進入實驗室</a>
+                <a href="#features-section" class="hover:text-cyan-400 transition flex items-center gap-1"><i data-lucide="shield-check" class="w-4 h-4"></i> 安全規範</a>
+            </nav>
+            <div class="flex items-center space-x-4">
+                <div class="text-right hidden sm:block">
+                    <span class="text-xs text-gray-400 block">系統狀態</span>
+                    <span class="text-xs text-emerald-400 flex items-center justify-end gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse"></span> 雲端計算已連線</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ================= 入口大廳頁面 (PORTAL PAGE) ================= -->
+    <main class="relative z-10 flex-grow flex flex-col justify-center items-center px-6 py-12">
         
-        <!-- 頂部導覽列 -->
-        <header class="border-b border-cyan-900/40 bg-gray-950/70 backdrop-blur-md sticky top-0 z-50 px-6 py-4">
-            <div class="max-w-7xl mx-auto flex justify-between items-center">
-                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchPage('portal')">
-                    <div class="relative">
-                        <i data-lucide="beaker" class="w-8 h-8 text-cyan-400 animate-pulse"></i>
-                        <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping"></span>
-                    </div>
-                    <span class="text-xl font-bold tracking-wider tech-font bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                        ChemLab <span class="text-xs bg-cyan-950 text-cyan-400 border border-cyan-800 px-1.5 py-0.5 rounded ml-1">VR v2.5</span>
-                    </span>
-                </div>
-                <nav class="hidden md:flex space-x-8 text-sm">
-                    <button onclick="switchPage('portal')" class="hover:text-cyan-400 transition flex items-center gap-1"><i data-lucide="home" class="w-4 h-4"></i> 首頁大廳</button>
-                    <button onclick="switchPage('lab')" class="text-cyan-400 hover:text-cyan-300 transition flex items-center gap-1"><i data-lucide="flask-conical" class="w-4 h-4"></i> 進入實驗室</button>
-                    <a href="#features-section" class="hover:text-cyan-400 transition flex items-center gap-1"><i data-lucide="shield-check" class="w-4 h-4"></i> 安全規範</a>
-                </nav>
-                <div class="flex items-center space-x-4">
-                    <div class="text-right hidden sm:block">
-                        <span class="text-xs text-gray-400 block">系統狀態</span>
-                        <span class="text-xs text-emerald-400 flex items-center justify-end gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse"></span> 雲端計算已連線</span>
-                    </div>
-                </div>
+        <!-- 英雄看板 -->
+        <div class="max-w-5xl mx-auto text-center space-y-8 my-auto">
+            <div class="inline-flex items-center gap-2 bg-cyan-950/60 border border-cyan-800/60 px-4 py-1.5 rounded-full text-xs text-cyan-300 tracking-wider mb-4 uppercase tech-font">
+                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span> NEXT-GEN SIMULATOR
             </div>
-        </header>
-
-        <!-- ================= 入口大廳頁面 (PORTAL PAGE) ================= -->
-        <main id="portal-page" class="page-transition opacity-100 flex-grow flex flex-col justify-center items-center px-6 py-12">
             
-            <!-- 英雄看板 -->
-            <div class="max-w-5xl mx-auto text-center space-y-8 my-auto">
-                <div class="inline-flex items-center gap-2 bg-cyan-950/60 border border-cyan-800/60 px-4 py-1.5 rounded-full text-xs text-cyan-300 tracking-wider mb-4 uppercase tech-font">
-                    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span> NEXT-GEN SIMULATOR
-                </div>
-                
-                <h1 class="text-5xl md:text-7xl font-black tracking-tight leading-none">
-                    探索無界限的<br>
-                    <span class="bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-500 bg-clip-text text-transparent neon-text">
-                        虛擬化學實驗室
+            <h1 class="text-5xl md:text-7xl font-black tracking-tight leading-none">
+                探索無界限的<br>
+                <span class="bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-500 bg-clip-text text-transparent neon-text">
+                    虛擬化學實驗室
+                </span>
+            </h1>
+            
+            <p class="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto font-light leading-relaxed">
+                安全、高精度、工業級模擬。融合動態分子反應引擎，讓您在零風險的環境中自由探索元素反應、酸鹼中和與劇烈化學變化。
+            </p>
+
+            <!-- 連結到 lab.html 的主按鈕 -->
+            <div class="pt-6 flex flex-col sm:flex-row justify-center items-center gap-4">
+                <a href="lab.html" class="group relative px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl text-black font-bold text-lg tracking-wide hover:shadow-[0_0_30px_rgba(6,182,212,0.6)] transition-all duration-300 transform hover:-translate-y-1 w-full sm:w-auto text-center block">
+                    <span class="flex items-center justify-center gap-2 text-slate-950">
+                        立即啟動模擬器 <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
                     </span>
-                </h1>
-                
-                <p class="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto font-light leading-relaxed">
-                    安全、高精度、無限次嘗試。融合動態分子反應引擎，讓您在零風險的環境中自由探索元素反應、酸鹼中和與劇烈化學變化。
-                </p>
-
-                <!-- 酷炫「進入實驗室」主按鈕 -->
-                <div class="pt-6 flex flex-col sm:flex-row justify-center items-center gap-4">
-                    <button onclick="switchPage('lab')" class="group relative px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl text-black font-bold text-lg tracking-wide hover:shadow-[0_0_30px_rgba(6,182,212,0.6)] transition-all duration-300 transform hover:-translate-y-1 w-full sm:w-auto">
-                        <span class="flex items-center justify-center gap-2 text-slate-950">
-                            立即啟動模擬器 <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
-                        </span>
-                        <span class="absolute -inset-0.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 opacity-30 blur group-hover:opacity-60 transition duration-300 -z-10"></span>
-                    </button>
-                    <a href="#features-section" class="px-8 py-4 bg-gray-900/80 border border-gray-800 hover:border-gray-700 rounded-xl text-gray-300 hover:text-white transition-all w-full sm:w-auto flex items-center justify-center gap-2">
-                        了解核心特色 <i data-lucide="help-circle" class="w-5 h-5"></i>
-                    </a>
-                </div>
+                    <span class="absolute -inset-0.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 opacity-30 blur group-hover:opacity-60 transition duration-300 -z-10"></span>
+                </a>
+                <a href="#features-section" class="px-8 py-4 bg-gray-900/80 border border-gray-800 hover:border-gray-700 rounded-xl text-gray-300 hover:text-white transition-all w-full sm:w-auto flex items-center justify-center gap-2">
+                    了解核心特色 <i data-lucide="help-circle" class="w-5 h-5"></i>
+                </a>
             </div>
+        </div>
 
-            <!-- 動態儀表裝飾區 -->
-            <div class="w-full max-w-6xl mx-auto mt-20 grid grid-cols-2 md:grid-cols-4 gap-4 px-4">
-                <div class="bg-gray-900/40 border border-gray-800/60 p-4 rounded-xl backdrop-blur-sm text-center">
-                    <span class="text-xs text-gray-500 block uppercase tracking-wider">化學元素支援</span>
-                    <span class="text-2xl font-bold text-cyan-400 tech-font mt-1 inline-block">118+ Elements</span>
-                </div>
-                <div class="bg-gray-900/40 border border-gray-800/60 p-4 rounded-xl backdrop-blur-sm text-center">
-                    <span class="text-xs text-gray-500 block uppercase tracking-wider">分子運動模擬</span>
-                    <span class="text-2xl font-bold text-teal-400 tech-font mt-1 inline-block">Real-Time 60FPS</span>
-                </div>
-                <div class="bg-gray-900/40 border border-gray-800/60 p-4 rounded-xl backdrop-blur-sm text-center">
-                    <span class="text-xs text-gray-500 block uppercase tracking-wider">安全危險防範</span>
-                    <span class="text-2xl font-bold text-emerald-400 tech-font mt-1 inline-block">0% Danger</span>
-                </div>
-                <div class="bg-gray-900/40 border border-gray-800/60 p-4 rounded-xl backdrop-blur-sm text-center">
-                    <span class="text-xs text-gray-500 block uppercase tracking-wider">實驗報告匯出</span>
-                    <span class="text-2xl font-bold text-blue-400 tech-font mt-1 inline-block">One-Click PDF</span>
-                </div>
+        <!-- 動態儀表裝飾區 -->
+        <div class="w-full max-w-6xl mx-auto mt-20 grid grid-cols-2 md:grid-cols-4 gap-4 px-4">
+            <div class="bg-gray-900/40 border border-gray-800/60 p-4 rounded-xl backdrop-blur-sm text-center">
+                <span class="text-xs text-gray-500 block uppercase tracking-wider">化學元素支援</span>
+                <span class="text-2xl font-bold text-cyan-400 tech-font mt-1 inline-block">118+ Elements</span>
             </div>
-
-            <!-- 特色說明區段 -->
-            <section id="features-section" class="w-full max-w-6xl mx-auto mt-24 pt-16 border-t border-gray-900/60">
-                <h2 class="text-3xl font-bold text-center mb-12">為何選擇 ChemLab VR 虛擬模擬器？</h2>
-                <div class="grid md:grid-cols-3 gap-8">
-                    <!-- 卡片 1 -->
-                    <div class="bg-gray-900/50 border border-gray-800/80 p-8 rounded-2xl hover:border-cyan-500/30 transition-all group">
-                        <div class="w-12 h-12 bg-cyan-950/80 border border-cyan-800 text-cyan-400 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                            <i data-lucide="shield" class="w-6 h-6"></i>
-                        </div>
-                        <h3 class="text-xl font-bold mb-3">100% 絕對安全環境</h3>
-                        <p class="text-gray-400 leading-relaxed text-sm">
-                            在現實中，強酸強鹼與易燃金屬極具危險性。但在 ChemLab，您可以在電腦前無憂無慮地進行最劇烈的放熱、產氣與沉澱反應。
-                        </p>
-                    </div>
-                    <!-- 卡片 2 -->
-                    <div class="bg-gray-900/50 border border-gray-800/80 p-8 rounded-2xl hover:border-teal-500/30 transition-all group">
-                        <div class="w-12 h-12 bg-teal-950/80 border border-teal-800 text-teal-400 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                            <i data-lucide="gauge" class="w-6 h-6"></i>
-                        </div>
-                        <h3 class="text-xl font-bold mb-3">多重數據儀表監控</h3>
-                        <p class="text-gray-400 leading-relaxed text-sm">
-                            模擬器內建精準的虛擬溫度計、pH 感測器、以及氣壓變化指示。這能讓您在調配配方時，隨時掌握底層的微觀化學變化。
-                        </p>
-                    </div>
-                    <!-- 卡片 3 -->
-                    <div class="bg-gray-900/50 border border-gray-800/80 p-8 rounded-2xl hover:border-blue-500/30 transition-all group">
-                        <div class="w-12 h-12 bg-blue-950/80 border border-blue-800 text-blue-400 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                            <i data-lucide="award" class="w-6 h-6"></i>
-                        </div>
-                        <h3 class="text-xl font-bold mb-3">科學原理直觀視覺化</h3>
-                        <p class="text-gray-400 leading-relaxed text-sm">
-                            告別生硬的化學課本方程式。當液體顏色產生漸變、氣泡狂冒時，模擬器會即時在屏幕上提示對應的化學反應式，學習更深刻。
-                        </p>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <!-- ================= 模擬實驗室主平台 (LAB PAGE) ================= -->
-        <main id="lab-page" class="page-transition hidden opacity-0 flex-grow p-4 md:p-8">
-            <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
-                
-                <!-- 左側：藥劑架與控制區 (Lg: col-span-4) -->
-                <div class="lg:col-span-4 space-y-6 flex flex-col justify-start">
-                    
-                    <!-- 實驗架控制面板 -->
-                    <div class="bg-gray-950/80 border border-cyan-900/40 rounded-2xl p-6 shadow-xl backdrop-blur-md">
-                        <div class="flex items-center justify-between mb-4 pb-4 border-b border-gray-900">
-                            <div class="flex items-center gap-2">
-                                <i data-lucide="beaker" class="text-cyan-400 w-5 h-5"></i>
-                                <h2 class="font-bold text-lg text-gray-200">化學藥劑架</h2>
-                            </div>
-                            <span class="text-xs text-cyan-400 font-mono bg-cyan-950 px-2 py-0.5 rounded">REAGENTS</span>
-                        </div>
-                        
-                        <!-- 類別：酸性與鹼性液體 -->
-                        <div class="space-y-4">
-                            <div>
-                                <h3 class="text-xs text-gray-400 mb-2 font-semibold tracking-wider flex items-center gap-1">
-                                    <span class="w-1.5 h-1.5 bg-red-400 rounded-full"></span> 液體試劑 (酸/鹼/水)
-                                </h3>
-                                <div class="grid grid-cols-2 gap-2">
-                                    <button onclick="pourLiquid('hcl')" class="py-2.5 px-3 bg-red-950/20 hover:bg-red-900/30 border border-red-900/30 hover:border-red-500/50 rounded-xl text-xs text-left transition-all flex items-center gap-2">
-                                        <span class="w-3 h-3 rounded-full bg-red-500/80"></span>
-                                        <div>
-                                            <p class="font-bold">HCl (鹽酸)</p>
-                                            <p class="text-[10px] text-gray-500">強酸性液體</p>
-                                        </div>
-                                    </button>
-                                    <button onclick="pourLiquid('naoh')" class="py-2.5 px-3 bg-blue-950/20 hover:bg-blue-900/30 border border-blue-900/30 hover:border-blue-500/50 rounded-xl text-xs text-left transition-all flex items-center gap-2">
-                                        <span class="w-3 h-3 rounded-full bg-blue-500/80"></span>
-                                        <div>
-                                            <p class="font-bold">NaOH (氫氧化鈉)</p>
-                                            <p class="text-[10px] text-gray-500">強鹼性液體</p>
-                                        </div>
-                                    </button>
-                                    <button onclick="pourLiquid('h2o')" class="py-2.5 px-3 bg-cyan-950/20 hover:bg-cyan-900/30 border border-cyan-900/30 hover:border-cyan-500/50 rounded-xl text-xs text-left transition-all flex items-center gap-2">
-                                        <span class="w-3 h-3 rounded-full bg-cyan-400/80"></span>
-                                        <div>
-                                            <p class="font-bold">H₂O (純水)</p>
-                                            <p class="text-[10px] text-gray-500">中性蒸餾水</p>
-                                        </div>
-                                    </button>
-                                    <button onclick="pourLiquid('nh3')" class="py-2.5 px-3 bg-indigo-950/20 hover:bg-indigo-900/30 border border-indigo-900/30 hover:border-indigo-500/50 rounded-xl text-xs text-left transition-all flex items-center gap-2">
-                                        <span class="w-3 h-3 rounded-full bg-indigo-400/80"></span>
-                                        <div>
-                                            <p class="font-bold">NH₃ (氨水)</p>
-                                            <p class="text-[10px] text-gray-500">弱鹼/有刺激味</p>
-                                        </div>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- 類別：酸鹼指示劑 -->
-                            <div>
-                                <h3 class="text-xs text-gray-400 mb-2 font-semibold tracking-wider flex items-center gap-1">
-                                    <span class="w-1.5 h-1.5 bg-fuchsia-400 rounded-full"></span> 酸鹼指示劑
-                                </h3>
-                                <div class="grid grid-cols-2 gap-2">
-                                    <button onclick="addIndicator('phenolphthalein')" class="py-2.5 px-3 bg-fuchsia-950/20 hover:bg-fuchsia-900/30 border border-fuchsia-900/30 hover:border-fuchsia-500/50 rounded-xl text-xs text-left transition-all flex items-center gap-2">
-                                        <span class="w-3 h-3 rounded-full bg-fuchsia-400/80 animate-pulse"></span>
-                                        <div>
-                                            <p class="font-bold">酚酞 (PP)</p>
-                                            <p class="text-[10px] text-gray-500">遇鹼變粉紅</p>
-                                        </div>
-                                    </button>
-                                    <button onclick="addIndicator('litmus')" class="py-2.5 px-3 bg-purple-950/20 hover:bg-purple-900/30 border border-purple-900/30 hover:border-purple-500/50 rounded-xl text-xs text-left transition-all flex items-center gap-2">
-                                        <span class="w-3 h-3 rounded-full bg-purple-400/80"></span>
-                                        <div>
-                                            <p class="font-bold">石蕊溶液</p>
-                                            <p class="text-[10px] text-gray-500">酸紅、鹼藍</p>
-                                        </div>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- 類別：固體試劑 -->
-                            <div>
-                                <h3 class="text-xs text-gray-400 mb-2 font-semibold tracking-wider flex items-center gap-1">
-                                    <span class="w-1.5 h-1.5 bg-amber-400 rounded-full"></span> 固體/金屬微粒
-                                </h3>
-                                <div class="grid grid-cols-2 gap-2">
-                                    <button onclick="addSolid('mg')" class="py-2.5 px-3 bg-amber-950/20 hover:bg-amber-900/30 border border-amber-900/30 hover:border-amber-500/50 rounded-xl text-xs text-left transition-all flex items-center gap-2">
-                                        <span class="w-3 h-3 bg-amber-400 rounded-sm"></span>
-                                        <div>
-                                            <p class="font-bold">Mg (鎂帶)</p>
-                                            <p class="text-[10px] text-gray-500">遇酸產生氫氣</p>
-                                        </div>
-                                    </button>
-                                    <button onclick="addSolid('cu')" class="py-2.5 px-3 bg-orange-950/20 hover:bg-orange-900/30 border border-orange-900/30 hover:border-orange-500/50 rounded-xl text-xs text-left transition-all flex items-center gap-2">
-                                        <span class="w-3 h-3 bg-orange-600 rounded-sm"></span>
-                                        <div>
-                                            <p class="font-bold">Cu (銅片)</p>
-                                            <p class="text-[10px] text-gray-500">不與稀酸反應</p>
-                                        </div>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 重置與清理按鈕 -->
-                        <div class="mt-6 pt-4 border-t border-gray-900 flex gap-3">
-                            <button onclick="resetBeaker()" class="flex-1 py-2.5 bg-red-950/40 hover:bg-red-900/50 border border-red-900 text-red-400 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i> 清空燒杯
-                            </button>
-                            <button onclick="addDistilledWater()" class="flex-1 py-2.5 bg-gray-900 hover:bg-gray-800 border border-gray-800 text-gray-300 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5">
-                                <i data-lucide="rotate-ccw" class="w-4 h-4"></i> 重新清洗
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- 實驗小助手 -->
-                    <div class="bg-gradient-to-br from-gray-950 to-slate-950 border border-cyan-900/20 rounded-2xl p-6 shadow-lg">
-                        <div class="flex items-center gap-2 mb-3 text-cyan-400">
-                            <i data-lucide="info" class="w-5 h-5"></i>
-                            <h3 class="font-bold text-sm">實驗挑戰指引</h3>
-                        </div>
-                        <ul class="text-xs text-gray-400 space-y-2 list-disc pl-4">
-                            <li><strong class="text-cyan-300">酸鹼中和：</strong> 先倒入 HCl，加入酚酞，然後慢慢加入 NaOH 觀察何時變為粉紅色。</li>
-                            <li><strong class="text-amber-300">金屬置換反應：</strong> 先倒入 HCl，再投入 Mg (鎂帶)，觀察劇烈氣泡與溫度計上升！</li>
-                            <li><strong class="text-purple-300">酸鹼指示劑：</strong> 將水、酸、鹼分別倒入，配合石蕊溶液觀察三原色的變幻。</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- 中間：核心模擬實驗操作台 (Lg: col-span-5) -->
-                <div class="lg:col-span-5 flex flex-col justify-between space-y-6">
-                    
-                    <!-- 燒杯大螢幕操作台 -->
-                    <div class="bg-gray-950/80 border border-cyan-900/40 rounded-2xl p-8 shadow-2xl backdrop-blur-md flex-grow flex flex-col justify-between relative min-h-[450px]">
-                        
-                        <!-- 頂部資訊與溫度計讀數 -->
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <span class="text-xs text-cyan-400 font-mono tracking-wider">LAB CHAMBER 01</span>
-                                <h3 class="text-lg font-bold text-gray-100 flex items-center gap-2 mt-1">
-                                    核心反應室
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-cyan-950 text-cyan-300 border border-cyan-800" id="current-state-tag">
-                                        等待加液中
-                                    </span>
-                                </h3>
-                            </div>
-                            
-                            <!-- 虛擬儀表 (溫度 / pH) -->
-                            <div class="flex gap-4">
-                                <div class="bg-gray-900/80 border border-cyan-900/30 px-3 py-1.5 rounded-xl text-center min-w-[70px]">
-                                    <span class="text-[10px] text-gray-400 block">溫度計</span>
-                                    <span id="temp-display" class="text-lg font-bold text-red-400 tech-font">25.0°C</span>
-                                </div>
-                                <div class="bg-gray-900/80 border border-cyan-900/30 px-3 py-1.5 rounded-xl text-center min-w-[70px]">
-                                    <span class="text-[10px] text-gray-400 block">pH 值</span>
-                                    <span id="ph-display" class="text-lg font-bold text-emerald-400 tech-font">7.0</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 燒杯視覺呈現中心 -->
-                        <div class="relative my-8 flex justify-center items-center">
-                            
-                            <!-- 滴加液體動畫元素 (隱藏，啟動時顯示) -->
-                            <div id="liquid-drop" class="absolute top-0 w-1.5 bg-cyan-400 h-0 transition-all duration-300 opacity-0 rounded-b"></div>
-
-                            <!-- 燒杯主體外框 -->
-                            <div class="relative w-56 h-64 border-4 border-t-0 border-gray-400/40 rounded-b-3xl flex flex-col justify-end overflow-hidden shadow-inner bg-white/5 backdrop-blur-[2px]">
-                                
-                                <!-- 燒杯刻度 -->
-                                <div class="absolute inset-y-0 right-4 flex flex-col justify-between py-4 text-[10px] text-gray-500 font-mono pointer-events-none select-none">
-                                    <span>- 250ml</span>
-                                    <span>- 200ml</span>
-                                    <span>- 150ml</span>
-                                    <span>- 100ml</span>
-                                    <span>- 50ml</span>
-                                </div>
-
-                                <!-- 液體層 -->
-                                <div id="liquid-layer" class="w-full h-0 bg-transparent transition-all duration-1000 relative liquid-wave">
-                                    
-                                    <!-- 動態氣泡容器 (在 H2 釋放時生成) -->
-                                    <div id="bubbles-container" class="absolute inset-0 overflow-hidden pointer-events-none">
-                                        <!-- 動態泡泡會利用 JS 在此生成 -->
-                                    </div>
-
-                                    <!-- 固體溶解/沈積物視覺 -->
-                                    <div id="solid-precipitate" class="absolute bottom-0 inset-x-0 h-4 bg-transparent transition-all duration-500 rounded-b-xl"></div>
-                                </div>
-                            </div>
-
-                            <!-- 燒杯中被投入的金屬片/固體 -->
-                            <div id="solid-metal" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 scale-0 transition-transform duration-500 flex flex-col items-center">
-                                <span class="px-2 py-0.5 bg-gray-500 text-white rounded text-[10px] font-bold shadow-md uppercase" id="solid-metal-label">Mg</span>
-                                <div class="w-8 h-4 bg-gray-400 rounded mt-1 shadow-lg border border-gray-300"></div>
-                            </div>
-                        </div>
-
-                        <!-- 下方控制鍵與目前反應資訊 -->
-                        <div class="border-t border-gray-900 pt-4 flex justify-between items-center text-sm">
-                            <span class="text-gray-400">目前容量: <span id="volume-display" class="font-bold text-cyan-400 font-mono">0</span> ml</span>
-                            <button onclick="stirBeaker()" class="px-4 py-2 bg-gray-900 hover:bg-gray-800 border border-cyan-900/30 text-cyan-400 rounded-xl font-bold flex items-center gap-2 transition hover:scale-105">
-                                <i data-lucide="loader" class="w-4 h-4 animate-spin"></i> 玻璃棒攪拌
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 右側：化學方程式與數據監控 (Lg: col-span-3) -->
-                <div class="lg:col-span-3 space-y-6">
-                    
-                    <!-- 化學反應觀測儀 -->
-                    <div class="bg-gray-950/80 border border-cyan-900/40 rounded-2xl p-6 shadow-xl backdrop-blur-md">
-                        <div class="flex items-center gap-2 mb-4 pb-4 border-b border-gray-900">
-                            <i data-lucide="cpu" class="text-cyan-400 w-5 h-5"></i>
-                            <h3 class="font-bold text-gray-200">實時反應方程式</h3>
-                        </div>
-                        
-                        <div class="bg-black/40 border border-gray-900 p-4 rounded-xl min-h-[100px] flex flex-col justify-center">
-                            <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">化學平衡反應方程式</p>
-                            <p id="equation-display" class="text-sm font-semibold text-cyan-300 leading-relaxed font-mono">
-                                等待試劑反應...
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- 溶液組成分析面板 -->
-                    <div class="bg-gray-950/80 border border-cyan-900/40 rounded-2xl p-6 shadow-xl backdrop-blur-md flex-grow">
-                        <div class="flex items-center gap-2 mb-4 pb-4 border-b border-gray-900">
-                            <i data-lucide="binary" class="text-teal-400 w-5 h-5"></i>
-                            <h3 class="font-bold text-gray-200">微觀離子濃度監測</h3>
-                        </div>
-                        
-                        <div class="space-y-4">
-                            <!-- H+ 離子 -->
-                            <div>
-                                <div class="flex justify-between text-xs mb-1">
-                                    <span class="text-gray-400">氫離子 [H⁺]</span>
-                                    <span id="conc-h" class="text-cyan-400 font-mono">1.0 x 10⁻⁷ M</span>
-                                </div>
-                                <div class="w-full bg-gray-900 rounded-full h-1.5">
-                                    <div id="bar-h" class="bg-cyan-500 h-1.5 rounded-full transition-all duration-500" style="width: 50%"></div>
-                                </div>
-                            </div>
-                            <!-- OH- 離子 -->
-                            <div>
-                                <div class="flex justify-between text-xs mb-1">
-                                    <span class="text-gray-400">氫氧根離子 [OH⁻]</span>
-                                    <span id="conc-oh" class="text-blue-400 font-mono">1.0 x 10⁻⁷ M</span>
-                                </div>
-                                <div class="w-full bg-gray-900 rounded-full h-1.5">
-                                    <div id="bar-oh" class="bg-blue-500 h-1.5 rounded-full transition-all duration-500" style="width: 50%"></div>
-                                </div>
-                            </div>
-                            <!-- 鹽類成分 -->
-                            <div>
-                                <div class="flex justify-between text-xs mb-1">
-                                    <span class="text-gray-400">溶解鹽類離子</span>
-                                    <span id="conc-salt" class="text-teal-400 font-mono">無</span>
-                                </div>
-                                <div class="w-full bg-gray-900 rounded-full h-1.5">
-                                    <div id="bar-salt" class="bg-teal-500 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 實驗記錄日誌 -->
-                    <div class="bg-gray-950/80 border border-cyan-900/40 rounded-2xl p-6 shadow-xl backdrop-blur-md">
-                        <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-900">
-                            <span class="font-bold text-gray-200 text-sm">反應分析日誌</span>
-                            <span class="text-[10px] text-gray-500 font-mono">LOGS</span>
-                        </div>
-                        <div id="log-container" class="space-y-2 max-h-36 overflow-y-auto text-[11px] font-mono text-gray-400">
-                            <div class="text-gray-500">&gt; 實驗室系統初始化完成。</div>
-                        </div>
-                    </div>
-
-                </div>
-
+            <div class="bg-gray-900/40 border border-gray-800/60 p-4 rounded-xl backdrop-blur-sm text-center">
+                <span class="text-xs text-gray-500 block uppercase tracking-wider">分子運動模擬</span>
+                <span class="text-2xl font-bold text-teal-400 tech-font mt-1 inline-block">Real-Time 60FPS</span>
             </div>
-        </main>
+            <div class="bg-gray-900/40 border border-gray-800/60 p-4 rounded-xl backdrop-blur-sm text-center">
+                <span class="text-xs text-gray-500 block uppercase tracking-wider">安全危險防範</span>
+                <span class="text-2xl font-bold text-emerald-400 tech-font mt-1 inline-block">0% Danger</span>
+            </div>
+            <div class="bg-gray-900/40 border border-gray-800/60 p-4 rounded-xl backdrop-blur-sm text-center">
+                <span class="text-xs text-gray-500 block uppercase tracking-wider">實驗報告匯出</span>
+                <span class="text-2xl font-bold text-blue-400 tech-font mt-1 inline-block">One-Click PDF</span>
+            </div>
+        </div>
 
-        <!-- 底部版權宣告與資訊 -->
-        <footer class="border-t border-gray-950 bg-gray-950/90 py-8 px-6 text-center text-sm text-gray-500 relative z-10">
-            <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-                <div class="text-left">
-                    <span class="text-lg font-bold tracking-wider tech-font bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                        ChemLab VR
-                    </span>
-                    <p class="text-xs text-gray-600 mt-1">
-                        &copy; 2026 ChemLab VR 模擬實驗室小組。保留所有權利。本模擬系統僅供教育、學習與演示用途。
+        <!-- 特色說明區段 -->
+        <section id="features-section" class="w-full max-w-6xl mx-auto mt-24 pt-16 border-t border-gray-900/60">
+            <h2 class="text-3xl font-bold text-center mb-12">為何選擇 ChemLab VR 虛擬模擬器？</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- 卡片 1 -->
+                <div class="bg-gray-900/50 border border-gray-800/80 p-8 rounded-2xl hover:border-cyan-500/30 transition-all group">
+                    <div class="w-12 h-12 bg-cyan-950/80 border border-cyan-800 text-cyan-400 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="shield" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">100% 絕對安全環境</h3>
+                    <p class="text-gray-400 leading-relaxed text-sm">
+                        在現實中，強酸強鹼與易燃金屬極具危險性。但在 ChemLab，您可以在最安全的數位化環境中自由探索放熱反應與劇烈化學變化。
                     </p>
                 </div>
-                <div class="flex space-x-6 text-xs">
-                    <a href="#" class="hover:text-cyan-400 transition">使用條款</a>
-                    <a href="#" class="hover:text-cyan-400 transition">隱私權政策</a>
-                    <a href="#" class="hover:text-cyan-400 transition">聯絡支持</a>
+                <!-- 卡片 2 -->
+                <div class="bg-gray-900/50 border border-gray-800/80 p-8 rounded-2xl hover:border-teal-500/30 transition-all group">
+                    <div class="w-12 h-12 bg-teal-950/80 border border-teal-800 text-teal-400 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="gauge" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">多重數據儀表監控</h3>
+                    <p class="text-gray-400 leading-relaxed text-sm">
+                        模擬器內建精準的虛擬溫度計、pH 感測器、以及氣壓變化指示。這能讓您在調配配方時，隨時掌握底層的微觀化學變化。
+                    </p>
+                </div>
+                <!-- 卡片 3 -->
+                <div class="bg-gray-900/50 border border-gray-800/80 p-8 rounded-2xl hover:border-blue-500/30 transition-all group">
+                    <div class="w-12 h-12 bg-blue-950/80 border border-blue-800 text-blue-400 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="award" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">科學原理直觀視覺化</h3>
+                    <p class="text-gray-400 leading-relaxed text-sm">
+                        告別生硬的化學課本方程式。當液體顏色產生漸變、氣泡狂冒時，模擬器會即時在屏幕上提示對應的化學反應式，學習更深刻。
+                    </p>
                 </div>
             </div>
-        </footer>
+        </section>
+    </main>
 
-    </div>
+    <!-- 底部版權宣告與資訊 -->
+    <footer class="border-t border-gray-950 bg-gray-950/90 py-8 px-6 text-center text-sm text-gray-500 relative z-10">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="text-left">
+                <span class="text-lg font-bold tracking-wider tech-font bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+                    ChemLab VR
+                </span>
+                <p class="text-xs text-gray-600 mt-1">
+                    &copy; 2026 ChemLab VR 模擬實驗室小組。保留所有權利。本模擬系統僅供教育、學習與演示用途。
+                </p>
+            </div>
+            <div class="flex space-x-6 text-xs">
+                <a href="#" class="hover:text-cyan-400 transition">使用條款</a>
+                <a href="#" class="hover:text-cyan-400 transition">隱私權政策</a>
+                <a href="#" class="hover:text-cyan-400 transition">聯絡支持</a>
+            </div>
+        </div>
+    </footer>
 
     <!-- ========================================================= -->
     <!-- =================== 核心 JAVASCRIPT ===================== -->
@@ -514,7 +204,7 @@
         // 初始化 Lucide 圖標
         lucide.createIcons();
 
-        // ================= 1. 背景漂浮粒子動畫 =================
+        // 背景漂浮粒子動畫
         function createParticles() {
             const container = document.getElementById('particle-container');
             const particleCount = 20;
@@ -537,396 +227,6 @@
             }
         }
         createParticles();
-
-        // ================= 2. 頁面切換控制 (入口網 ⇄ 模擬實驗室) =================
-        function switchPage(pageId) {
-            const portal = document.getElementById('portal-page');
-            const lab = document.getElementById('lab-page');
-
-            if (pageId === 'lab') {
-                // 轉場淡出入口
-                portal.classList.add('opacity-0', 'scale-95');
-                setTimeout(() => {
-                    portal.classList.add('hidden');
-                    lab.classList.remove('hidden');
-                    // 觸發淡入實驗室
-                    setTimeout(() => {
-                        lab.classList.remove('opacity-0');
-                        lab.classList.add('opacity-100');
-                    }, 50);
-                }, 400);
-            } else {
-                // 轉場淡出實驗室
-                lab.classList.add('opacity-0');
-                setTimeout(() => {
-                    lab.classList.add('hidden');
-                    portal.classList.remove('hidden');
-                    setTimeout(() => {
-                        portal.classList.remove('opacity-0', 'scale-95');
-                        portal.classList.add('opacity-100');
-                    }, 50);
-                }, 400);
-            }
-        }
-
-        // ================= 3. 核心化學反應引擎 =================
-        
-        // 燒杯當前狀態變數
-        let beakerState = {
-            volume: 0,              // ml
-            hcl_val: 0,             // 份量
-            naoh_val: 0,            // 份量
-            h2o_val: 0,             // 份量
-            nh3_val: 0,             // 份量
-            hasPhenolphthalein: false, // 酚酞
-            hasLitmus: false,       // 石蕊
-            hasMg: false,           // 鎂
-            hasCu: false,           // 銅
-            temperature: 25.0,      // °C
-            ph: 7.0                 // pH
-        };
-
-        // 寫入日誌函式
-        function writeLog(message, type = 'info') {
-            const container = document.getElementById('log-container');
-            const logItem = document.createElement('div');
-            
-            let colorClass = 'text-gray-400';
-            if (type === 'success') colorClass = 'text-emerald-400';
-            if (type === 'danger') colorClass = 'text-red-400';
-            if (type === 'warning') colorClass = 'text-amber-400';
-            if (type === 'action') colorClass = 'text-cyan-400';
-
-            logItem.className = `${colorClass} py-0.5 border-b border-gray-900/40`;
-            logItem.innerHTML = `&gt; ${message}`;
-            container.appendChild(logItem);
-            
-            // 自動滾動到底部
-            container.scrollTop = container.scrollHeight;
-        }
-
-        // 倒液體動畫
-        function triggerPourAnimation(color) {
-            const drop = document.getElementById('liquid-drop');
-            drop.style.backgroundColor = color;
-            drop.style.opacity = '1';
-            drop.style.height = '120px';
-            
-            setTimeout(() => {
-                drop.style.opacity = '0';
-                drop.style.height = '0px';
-            }, 500);
-        }
-
-        // 傾倒液體入口
-        function pourLiquid(type) {
-            if (beakerState.volume >= 250) {
-                writeLog('燒杯已滿！請先清空或進行洗滌。', 'warning');
-                return;
-            }
-
-            let pourColor = '#22d3ee'; // 預設藍綠色水
-            if (type === 'hcl') {
-                beakerState.hcl_val += 50;
-                pourColor = 'rgba(239, 68, 68, 0.4)'; // 微偏紅色調
-                writeLog('加入了 50ml 鹽酸 (HCl)。', 'action');
-            } else if (type === 'naoh') {
-                beakerState.naoh_val += 50;
-                pourColor = 'rgba(59, 130, 246, 0.4)'; // 微藍
-                writeLog('加入了 50ml 氫氧化鈉溶液 (NaOH)。', 'action');
-            } else if (type === 'h2o') {
-                beakerState.h2o_val += 50;
-                pourColor = 'rgba(6, 182, 212, 0.2)'; // 水藍
-                writeLog('加入了 50ml 蒸餾水 (H₂O)。', 'action');
-            } else if (type === 'nh3') {
-                beakerState.nh3_val += 50;
-                pourColor = 'rgba(129, 140, 248, 0.3)'; // 紫藍
-                writeLog('加入了 50ml 氨水 (NH₃)。', 'action');
-            }
-
-            beakerState.volume += 50;
-            triggerPourAnimation(pourColor);
-
-            // 更新模擬反應
-            setTimeout(() => {
-                calculateReaction();
-            }, 300);
-        }
-
-        // 添加酸鹼指示劑
-        function addIndicator(type) {
-            if (beakerState.volume === 0) {
-                writeLog('燒杯中沒有任何溶劑，無法添加指示劑！', 'warning');
-                return;
-            }
-
-            if (type === 'phenolphthalein') {
-                beakerState.hasPhenolphthalein = true;
-                writeLog('添加了幾滴 酚酞 指示劑。', 'success');
-            } else if (type === 'litmus') {
-                beakerState.hasLitmus = true;
-                writeLog('添加了幾滴 石蕊 指示劑。', 'success');
-            }
-
-            calculateReaction();
-        }
-
-        // 添加固體金屬
-        function addSolid(type) {
-            if (type === 'mg') {
-                if (beakerState.hasMg) {
-                    writeLog('燒杯內已有一片鎂帶！', 'warning');
-                    return;
-                }
-                beakerState.hasMg = true;
-                document.getElementById('solid-metal').classList.remove('scale-0');
-                document.getElementById('solid-metal').classList.add('scale-100');
-                document.getElementById('solid-metal-label').innerText = 'Mg';
-                writeLog('向燒杯中投入了 鎂帶 (Mg)！', 'action');
-            } else if (type === 'cu') {
-                if (beakerState.hasCu) {
-                    writeLog('燒杯內已有一片銅片！', 'warning');
-                    return;
-                }
-                beakerState.hasCu = true;
-                document.getElementById('solid-metal').classList.remove('scale-0');
-                document.getElementById('solid-metal').classList.add('scale-100');
-                document.getElementById('solid-metal-label').innerText = 'Cu';
-                writeLog('向燒杯中投入了 銅片 (Cu)。', 'action');
-            }
-
-            calculateReaction();
-        }
-
-        // 清空燒杯
-        function resetBeaker() {
-            beakerState = {
-                volume: 0,
-                hcl_val: 0,
-                naoh_val: 0,
-                h2o_val: 0,
-                nh3_val: 0,
-                hasPhenolphthalein: false,
-                hasLitmus: false,
-                hasMg: false,
-                hasCu: false,
-                temperature: 25.0,
-                ph: 7.0
-            };
-
-            // 復原 DOM 元素
-            const liquid = document.getElementById('liquid-layer');
-            liquid.style.height = '0%';
-            liquid.style.backgroundColor = 'transparent';
-            
-            document.getElementById('solid-metal').classList.remove('scale-100');
-            document.getElementById('solid-metal').classList.add('scale-0');
-            document.getElementById('bubbles-container').innerHTML = '';
-            
-            document.getElementById('equation-display').innerText = '等待試劑反應...';
-            document.getElementById('current-state-tag').innerText = '等待加液中';
-            document.getElementById('current-state-tag').className = 'inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-cyan-950 text-cyan-300 border border-cyan-800';
-
-            writeLog('已清空燒杯並洗滌完畢。', 'success');
-            updateUI();
-        }
-
-        // 用蒸餾水清洗（重設不記錄日誌）
-        function addDistilledWater() {
-            resetBeaker();
-            pourLiquid('h2o');
-        }
-
-        // 玻璃棒攪拌
-        function stirBeaker() {
-            if (beakerState.volume === 0) {
-                writeLog('空無一物的燒杯不需要攪拌。', 'warning');
-                return;
-            }
-            writeLog('使用玻璃棒進行均勻攪拌。加速反應進行。', 'success');
-            calculateReaction();
-        }
-
-        // 氣泡發生器 (氫氣產生效果)
-        function startBubbleEffect() {
-            const container = document.getElementById('bubbles-container');
-            container.innerHTML = ''; // 清除舊的
-
-            // 動態創建 12 個隨機上升氣泡
-            for (let i = 0; i < 15; i++) {
-                const bubble = document.createElement('span');
-                bubble.className = 'bubble absolute w-2 h-2 bg-white/40 rounded-full bottom-0';
-                bubble.style.left = `${Math.random() * 85 + 5}%`;
-                bubble.style.animationDelay = `${Math.random() * 2}s`;
-                bubble.style.animationDuration = `${Math.random() * 1.5 + 0.8}s`;
-                container.appendChild(bubble);
-            }
-        }
-
-        function stopBubbleEffect() {
-            const container = document.getElementById('bubbles-container');
-            container.innerHTML = '';
-        }
-
-        // ================= 4. 核心物理/化學計算邏輯 =================
-        function calculateReaction() {
-            let ph = 7.0;
-            let temp = 25.0;
-            let finalColor = 'rgba(255, 255, 255, 0.15)'; // 預設微弱半透明 (清水)
-            let equation = '等待試劑反應...';
-            let stateTag = '等待反應中';
-            let stateTagClass = 'bg-cyan-950 text-cyan-300 border-cyan-800';
-
-            // 1. 計算氫氧根與氫離子相對份量，決定 pH 值
-            // 強酸 HCl vs 強鹼 NaOH, 弱鹼 NH3
-            const acidIntensity = beakerState.hcl_val;
-            const baseIntensity = beakerState.naoh_val + (beakerState.nh3_val * 0.4); // 弱鹼乘上權重
-
-            if (acidIntensity > baseIntensity) {
-                // 酸過量
-                const diff = acidIntensity - baseIntensity;
-                ph = Math.max(1.0, 7.0 - (diff / 25));
-                stateTag = '酸性溶液';
-                stateTagClass = 'bg-red-950 text-red-300 border-red-800';
-            } else if (baseIntensity > acidIntensity) {
-                // 鹼過量
-                const diff = baseIntensity - acidIntensity;
-                ph = Math.min(14.0, 7.0 + (diff / 20));
-                stateTag = '鹼性溶液';
-                stateTagClass = 'bg-blue-950 text-blue-300 border-blue-800';
-            } else if (acidIntensity > 0 && baseIntensity > 0) {
-                // 正好酸鹼中和
-                ph = 7.0;
-                stateTag = '中和完畢 (鹽類溶液)';
-                stateTagClass = 'bg-emerald-950 text-emerald-300 border-emerald-800';
-            }
-
-            // 2. 指示劑色彩判定
-            if (beakerState.hasPhenolphthalein) {
-                if (ph > 8.2) {
-                    // 酚酞遇鹼變紅/粉紅
-                    const intensity = Math.min(0.8, (ph - 8) * 0.2);
-                    finalColor = `rgba(236, 72, 153, ${intensity})`; // Fuchsia-500
-                } else {
-                    // 酚酞在酸性或中性為無色
-                    finalColor = 'rgba(255, 255, 255, 0.1)';
-                }
-            } else if (beakerState.hasLitmus) {
-                if (ph < 5.0) {
-                    // 石蕊遇酸呈紅色
-                    finalColor = 'rgba(239, 68, 68, 0.5)';
-                } else if (ph > 8.0) {
-                    // 石蕊遇鹼呈藍色
-                    finalColor = 'rgba(59, 130, 246, 0.5)';
-                } else {
-                    // 中性呈紫色
-                    finalColor = 'rgba(139, 92, 246, 0.4)';
-                }
-            } else {
-                // 無指示劑時，根據是否有離子呈現透明色或輕微乳白
-                if (beakerState.naoh_val > 0 && beakerState.hcl_val > 0) {
-                    finalColor = 'rgba(224, 242, 254, 0.2)'; // 輕微的鹽水藍
-                } else if (beakerState.hcl_val > 0) {
-                    finalColor = 'rgba(254, 226, 226, 0.15)';
-                } else if (beakerState.naoh_val > 0) {
-                    finalColor = 'rgba(219, 234, 254, 0.15)';
-                }
-            }
-
-            // 3. 特殊化學反應 (酸中和放熱、金屬置換反應)
-            
-            // A. 酸鹼中和放熱反應
-            if (beakerState.hcl_val > 0 && beakerState.naoh_val > 0) {
-                const reactionAmount = Math.min(beakerState.hcl_val, beakerState.naoh_val);
-                temp += (reactionAmount * 0.15); // 每 50ml 放熱約 7.5 度
-                equation = 'HCl + NaOH → NaCl + H₂O (放熱中和反應)';
-                
-                // 動態添加放熱警報日誌
-                if (temp > 35 && beakerState.temperature < 34) {
-                    writeLog('強酸強鹼發生中和反應，釋放大量化學熱能！', 'danger');
-                }
-            }
-
-            // B. 鎂帶與鹽酸劇烈置換反應
-            if (beakerState.hasMg && beakerState.hcl_val > 0) {
-                const activeAcid = beakerState.hcl_val;
-                temp += (activeAcid * 0.25); // 鎂遇強酸放熱更劇烈
-                equation = 'Mg + 2HCl → MgCl₂ + H₂↑ (產生大量氫氣)';
-                stateTag = '金屬置換 (產氣劇烈)';
-                stateTagClass = 'bg-amber-950 text-amber-300 border-amber-800 animate-pulse';
-                
-                startBubbleEffect();
-                writeLog('鎂帶與鹽酸進行劇烈反應，釋放氫氣 (H₂)，溫度攀升！', 'danger');
-            } else if (beakerState.hasCu && beakerState.hcl_val > 0) {
-                equation = 'Cu + HCl → 無反應 (銅活性小於氫)';
-                writeLog('注意：銅活性較低，不與稀鹽酸產生化學反應。', 'warning');
-                stopBubbleEffect();
-            } else {
-                stopBubbleEffect();
-            }
-
-            // 平滑套用溫度與pH
-            beakerState.temperature = Math.min(95, temp);
-            beakerState.ph = ph;
-
-            // 渲染液體高度比例 (最高 250ml)
-            const heightPercent = Math.min(92, (beakerState.volume / 250) * 85 + 5);
-            
-            // 套用動畫與樣式變化
-            const liquidLayer = document.getElementById('liquid-layer');
-            liquidLayer.style.height = `${heightPercent}%`;
-            liquidLayer.style.backgroundColor = finalColor;
-
-            // 更新方程式與標籤
-            document.getElementById('equation-display').innerText = equation;
-            const tagEl = document.getElementById('current-state-tag');
-            tagEl.innerText = stateTag;
-            tagEl.className = `inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium border ${stateTagClass}`;
-
-            updateUI();
-        }
-
-        // ================= 5. UI 資料即時綁定 =================
-        function updateUI() {
-            // 溫度與 pH 更新 (四捨五入到小數點第一位)
-            document.getElementById('temp-display').innerText = `${beakerState.temperature.toFixed(1)}°C`;
-            document.getElementById('ph-display').innerText = beakerState.ph.toFixed(1);
-            document.getElementById('volume-display').innerText = beakerState.volume;
-
-            // 溫度警示顏色調整
-            if (beakerState.temperature > 40) {
-                document.getElementById('temp-display').className = 'text-lg font-bold text-red-500 tech-font animate-pulse';
-            } else {
-                document.getElementById('temp-display').className = 'text-lg font-bold text-red-400 tech-font';
-            }
-
-            // 更新右側離子微觀濃度指示
-            const ph = beakerState.ph;
-            const hConc = Math.pow(10, -ph);
-            const ohConc = Math.pow(10, -(14 - ph));
-
-            // 渲染格式 (科學記號)
-            document.getElementById('conc-h').innerText = `${hConc.toExponential(1)} M`;
-            document.getElementById('conc-oh').innerText = `${ohConc.toExponential(1)} M`;
-
-            // 進度條寬度百分比
-            // pH 1-14 轉百分比
-            const hPercent = Math.min(100, Math.max(0, ((14 - ph) / 14) * 100));
-            const ohPercent = Math.min(100, Math.max(0, (ph / 14) * 100));
-            
-            document.getElementById('bar-h').style.width = `${hPercent}%`;
-            document.getElementById('bar-oh').style.width = `${ohPercent}%`;
-
-            // 鹽類離子進度條
-            const totalSalts = Math.min(beakerState.hcl_val, beakerState.naoh_val);
-            if (totalSalts > 0) {
-                document.getElementById('conc-salt').innerText = `${(totalSalts / 200).toFixed(2)} M (NaCl)`;
-                document.getElementById('bar-salt').style.width = `${(totalSalts / 250) * 100}%`;
-            } else {
-                document.getElementById('conc-salt').innerText = '0.00 M';
-                document.getElementById('bar-salt').style.width = '0%';
-            }
-        }
     </script>
 </body>
 </html>
