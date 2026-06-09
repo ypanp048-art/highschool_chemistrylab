@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>化學實驗室安全規範與互動學習網</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap');
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        /* 自訂細節微調 */
+        .glass-card {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glow-emerald:hover {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+        }
+        .glow-rose:hover {
+            box-shadow: 0 0 20px rgba(244, 63, 94, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-emerald-500 selection:text-slate-900 overflow-x-hidden">
+
+    <!-- 頂部導覽列 -->
+    <nav class="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-md border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-gradient-to-tr from-emerald-500 to-cyan-500 p-2 rounded-lg text-slate-950">
+                        <i class="fa-solid fa-flask-vial text-xl font-bold"></i>
+                    </div>
+                    <span class="text-lg font-bold tracking-wider bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">CHEMSAFE</span>
+                </div>
+                <div class="hidden md:flex space-x-6 text-sm font-medium text-slate-300">
+                    <a href="#rules" class="hover:text-emerald-400 transition-colors">實驗守則</a>
+                    <a href="#ghs" class="hover:text-emerald-400 transition-colors">GHS 標示</a>
+                    <a href="#quiz" class="hover:text-emerald-400 transition-colors">安全挑戰</a>
+                    <a href="#emergency" class="hover:text-emerald-400 transition-colors">緊急應變</a>
+                </div>
+                <div>
+                    <button onclick="scrollToSection('emergency-sim')" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-300 flex items-center space-x-1">
+                        <span class="animate-pulse inline-block w-2 h-2 rounded-full bg-rose-500 mr-1"></span>
+                        緊急通報模擬
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主視覺 Banner (Hero) -->
+    <header class="relative relative overflow-hidden py-20 lg:py-28 border-b border-slate-900">
+        <!-- 裝飾背景特效 -->
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full filter blur-[100px] pointer-events-none"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full filter blur-[100px] pointer-events-none"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <span class="px-3 py-1 text-xs font-semibold text-emerald-400 bg-emerald-950/50 border border-emerald-800 rounded-full uppercase tracking-widest">
+                <i class="fa-solid fa-shield-halved mr-1"></i> 實驗安全 • 生命第一
+            </span>
+            <h1 class="mt-6 text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight">
+                化學實驗室 <span class="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">安全防護指南</span>
+            </h1>
+            <p class="mt-4 max-w-2xl mx-auto text-base sm:text-lg text-slate-400 leading-relaxed">
+                嚴謹的態度、標準的操作、齊全的防護，是平安完成每項化學探索的基石。在進入實驗室前，請務必詳閱並遵循以下規範。
+            </p>
+            <div class="mt-10 flex flex-wrap justify-center gap-4">
+                <a href="#rules" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-bold px-8 py-3.5 rounded-xl shadow-lg shadow-emerald-950/50 transition-all duration-300">
+                    開始學習守則
+                </a>
+                <a href="#quiz" class="bg-slate-900 hover:bg-slate-850 text-slate-300 border border-slate-800 font-medium px-8 py-3.5 rounded-xl transition-all duration-300">
+                    知識挑戰測驗
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 核心安全守則搜尋與卡片 -->
+    <section id="rules" class="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
+            <div>
+                <h2 class="text-3xl font-bold tracking-tight text-slate-100 flex items-center gap-2">
+                    <i class="fa-solid fa-clipboard-list text-emerald-400"></i> 實驗室核心守則
+                </h2>
+                <p class="text-slate-400 mt-2">點選分類或直接搜尋，查看詳盡的實驗安全注意事項。</p>
+            </div>
+            
+            <!-- 搜尋框 -->
+            <div class="mt-6 md:mt-0 relative w-full md:w-80">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                <input type="text" id="ruleSearch" onkeyup="filterRules()" placeholder="搜尋安全關鍵字（如：隱形眼鏡）..." 
+                       class="w-full bg-slate-900/80 border border-slate-800 rounded-xl py-3 pl-10 pr-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-sm">
+            </div>
+        </div>
+
+        <!-- 類別篩選按鈕 -->
+        <div class="flex flex-wrap gap-2.5 mb-8">
+            <button onclick="filterCategory('all')" class="category-btn active px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 bg-emerald-500 text-slate-950" id="btn-all">
+                全部守則 (<span id="count-all">0</span>)
+            </button>
+            <button onclick="filterCategory('ppe')" class="category-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 bg-slate-900 text-slate-400 border border-slate-800 hover:text-slate-200" id="btn-ppe">
+                個人防護 (<span id="count-ppe">0</span>)
+            </button>
+            <button onclick="filterCategory('handling')" class="category-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 bg-slate-900 text-slate-400 border border-slate-800 hover:text-slate-200" id="btn-handling">
+                化學品處置 (<span id="count-handling">0</span>)
+            </button>
+            <button onclick="filterCategory('emergency')" class="category-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 bg-slate-900 text-slate-400 border border-slate-800 hover:text-slate-200" id="btn-emergency">
+                緊急應變 (<span id="count-emergency">0</span>)
+            </button>
+            <button onclick="filterCategory('behavior')" class="category-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 bg-slate-900 text-slate-400 border border-slate-800 hover:text-slate-200" id="btn-behavior">
+                基本行為 (<span id="count-behavior">0</span>)
+            </button>
+        </div>
+
+        <!-- 守則卡片網格 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="rulesGrid">
+            <!-- 由 JavaScript 動態生成 -->
+        </div>
+
+        <!-- 查無資料提示 -->
+        <div id="noRulesMsg" class="hidden text-center py-16 text-slate-500 border border-dashed border-slate-800 rounded-2xl bg-slate-950">
+            <i class="fa-solid fa-triangle-exclamation text-4xl text-amber-500 mb-3"></i>
+            <p class="text-lg">查無相符的安全守則，請嘗試其他關鍵字。</p>
+        </div>
+    </section>
+
+    <!-- GHS 化學品危害標示互動圖鑑 -->
+    <section id="ghs" class="py-20 bg-slate-900/40 border-y border-slate-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold tracking-tight text-slate-100 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-500 animate-pulse"></i> GHS 化學品危害標示圖鑑
+                </h2>
+                <p class="text-slate-400 mt-2 max-w-2xl mx-auto">全球化學品統一分類和標籤制度 (GHS)。認識紅色菱形框內的圖示，一眼辨識化學品危險性。</p>
+            </div>
+
+            <!-- 圖示網格 -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                <!-- GHS 1 -->
+                <div onclick="showGhsDetails('flammable')" class="glass-card p-5 rounded-2xl border border-slate-800 hover:border-amber-500/50 cursor-pointer transition-all duration-300 text-center group glow-emerald">
+                    <div class="w-24 h-24 mx-auto flex items-center justify-center border-2 border-red-600 rounded-lg bg-white rotate-45 transform p-2 transition-transform group-hover:scale-105">
+                        <i class="fa-solid fa-fire text-4xl text-black -rotate-45"></i>
+                    </div>
+                    <h3 class="mt-8 font-bold text-slate-200 text-lg">易燃物</h3>
+                    <p class="text-xs text-slate-400 mt-1">Flammables</p>
+                </div>
+
+                <!-- GHS 2 -->
+                <div onclick="showGhsDetails('oxidizing')" class="glass-card p-5 rounded-2xl border border-slate-800 hover:border-amber-500/50 cursor-pointer transition-all duration-300 text-center group glow-emerald">
+                    <div class="w-24 h-24 mx-auto flex items-center justify-center border-2 border-red-600 rounded-lg bg-white rotate-45 transform p-2 transition-transform group-hover:scale-105">
+                        <i class="fa-solid fa-circle-radiation text-4xl text-black -rotate-45"></i>
+                    </div>
+                    <h3 class="mt-8 font-bold text-slate-200 text-lg">氧化性物質</h3>
+                    <p class="text-xs text-slate-400 mt-1">Oxidizers</p>
+                </div>
+
+                <!-- GHS 3 -->
+                <div onclick="showGhsDetails('toxic')" class="glass-card p-5 rounded-2xl border border-slate-800 hover:border-amber-500/50 cursor-pointer transition-all duration-300 text-center group glow-emerald">
+                    <div class="w-24 h-24 mx-auto flex items-center justify-center border-2 border-red-600 rounded-lg bg-white rotate-45 transform p-2 transition-transform group-hover:scale-105">
+                        <i class="fa-solid fa-skull-crossbones text-4xl text-black -rotate-45"></i>
+                    </div>
+                    <h3 class="mt-8 font-bold text-slate-200 text-lg">急性毒性物質</h3>
+                    <p class="text-xs text-slate-400 mt-1">Acute Toxicity</p>
+                </div>
+
+                <!-- GHS 4 -->
+                <div onclick="showGhsDetails('corrosive')" class="glass-card p-5 rounded-2xl border border-slate-800 hover:border-amber-500/50 cursor-pointer transition-all duration-300 text-center group glow-emerald">
+                    <div class="w-24 h-24 mx-auto flex items-center justify-center border-2 border-red-600 rounded-lg bg-white rotate-45 transform p-2 transition-transform group-hover:scale-105">
+                        <i class="fa-solid fa-vial-virus text-4xl text-black -rotate-45"></i>
+                    </div>
+                    <h3 class="mt-8 font-bold text-slate-200 text-lg">腐蝕性物質</h3>
+                    <p class="text-xs text-slate-400 mt-1">Corrosives</p>
+                </div>
+
+                <!-- GHS 5 -->
+                <div onclick="showGhsDetails('health_hazard')" class="glass-card p-5 rounded-2xl border border-slate-800 hover:border-amber-500/50 cursor-pointer transition-all duration-300 text-center group glow-emerald col-span-2 md:col-span-1 mx-auto w-full max-w-[200px] md:max-w-none">
+                    <div class="w-24 h-24 mx-auto flex items-center justify-center border-2 border-red-600 rounded-lg bg-white rotate-45 transform p-2 transition-transform group-hover:scale-105">
+                        <i class="fa-solid fa-person-burst text-4xl text-black -rotate-45"></i>
+                    </div>
+                    <h3 class="mt-8 font-bold text-slate-200 text-lg">健康危害</h3>
+                    <p class="text-xs text-slate-400 mt-1">Health Hazards</p>
+                </div>
+            </div>
+
+            <!-- GHS 詳細燈箱/視窗 (浮動面板) -->
+            <div id="ghsModal" class="hidden mt-10 p-6 rounded-2xl glass-card border border-slate-700/80 bg-slate-900/90 max-w-3xl mx-auto transition-all duration-500">
+                <div class="flex items-start justify-between">
+                    <div class="flex items-center space-x-4">
+                        <div id="ghsModalIcon" class="p-3 bg-red-600/10 border border-red-500/30 rounded-xl text-red-500 text-3xl">
+                            <!-- JS 動態插入 -->
+                        </div>
+                        <div>
+                            <h4 id="ghsModalTitle" class="text-xl font-bold text-slate-100"><!-- JS 動態插入 --></h4>
+                            <p id="ghsModalEng" class="text-xs text-slate-400 uppercase tracking-widest mt-0.5"><!-- JS 動態插入 --></p>
+                        </div>
+                    </div>
+                    <button onclick="closeGhsDetails()" class="text-slate-500 hover:text-slate-300 transition-colors">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+                <div class="mt-6 border-t border-slate-800 pt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h5 class="font-bold text-amber-400 text-sm flex items-center gap-1">
+                            <i class="fa-solid fa-circle-info"></i> 代表特徵
+                        </h5>
+                        <p id="ghsModalFeatures" class="text-sm text-slate-300 mt-2 leading-relaxed"><!-- JS 動態插入 --></p>
+                    </div>
+                    <div>
+                        <h5 class="font-bold text-emerald-400 text-sm flex items-center gap-1">
+                            <i class="fa-solid fa-shield"></i> 安全處置建議
+                        </h5>
+                        <p id="ghsModalAdvice" class="text-sm text-slate-300 mt-2 leading-relaxed"><!-- JS 動態插入 --></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 安全知識互動挑戰賽 (Quiz) -->
+    <section id="quiz" class="py-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="glass-card p-8 rounded-3xl border border-slate-800 relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-40 h-40 bg-emerald-500/10 rounded-full filter blur-xl"></div>
+            
+            <div class="text-center mb-10">
+                <span class="px-3 py-1 text-xs font-semibold text-emerald-400 bg-emerald-950/50 border border-emerald-900 rounded-full uppercase tracking-wider">
+                    TEST YOUR KNOWLEDGE
+                </span>
+                <h2 class="text-3xl font-bold tracking-tight text-slate-100 mt-3 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-graduation-cap text-emerald-400"></i> 實驗安全知識挑戰
+                </h2>
+                <p class="text-slate-400 text-sm mt-1">進入實驗室前，先來做個快速檢測吧！通關需要回答正確所有題目。</p>
+            </div>
+
+            <!-- 測驗進行區 -->
+            <div id="quizContainer">
+                <div class="flex items-center justify-between mb-6 text-sm text-slate-400">
+                    <span>題目 <span id="currentQuestionNum" class="text-emerald-400 font-bold">1</span> / <span id="totalQuestions">3</span></span>
+                    <span>得分: <span id="currentScore" class="text-emerald-400 font-bold">0</span></span>
+                </div>
+
+                <!-- 進度條 -->
+                <div class="w-full bg-slate-800 rounded-full h-1.5 mb-8">
+                    <div id="progressBar" class="bg-gradient-to-r from-emerald-500 to-cyan-500 h-1.5 rounded-full transition-all duration-300" style="width: 33%"></div>
+                </div>
+
+                <!-- 問題描述 -->
+                <div class="mb-8">
+                    <h3 id="questionText" class="text-lg sm:text-xl font-semibold text-slate-100 leading-relaxed">
+                        <!-- JS 動態插入 -->
+                    </h3>
+                </div>
+
+                <!-- 選項按鈕群 -->
+                <div class="space-y-4" id="optionsContainer">
+                    <!-- JS 動態插入 -->
+                </div>
+
+                <!-- 答題解析反饋 -->
+                <div id="feedbackContainer" class="hidden mt-6 p-5 rounded-2xl border text-sm transition-all duration-300">
+                    <!-- JS 動態插入 -->
+                </div>
+
+                <!-- 下一題按鈕 -->
+                <div class="mt-8 flex justify-end">
+                    <button id="nextBtn" onclick="nextQuestion()" disabled class="hidden bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-6 py-2.5 rounded-xl disabled:opacity-50 transition-all duration-300">
+                        下一題 <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 測驗結束成果發表 -->
+            <div id="resultContainer" class="hidden text-center py-8">
+                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-4xl mb-6">
+                    <i id="resultIcon" class="fa-solid fa-award"></i>
+                </div>
+                <h3 id="resultTitle" class="text-2xl font-bold text-slate-100"><!-- JS 插入 --></h3>
+                <p id="resultText" class="text-slate-400 mt-2 max-w-md mx-auto"><!-- JS 插入 --></p>
+                <div class="mt-8 flex justify-center gap-4">
+                    <button onclick="restartQuiz()" class="bg-slate-900 hover:bg-slate-850 text-slate-200 border border-slate-800 font-semibold px-6 py-3 rounded-xl transition-all">
+                        重新測試
+                    </button>
+                    <a href="#rules" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold px-6 py-3 rounded-xl transition-all">
+                        複習安全守則
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 緊急應變 SOP 虛擬模擬器 -->
+    <section id="emergency-sim" class="py-20 bg-slate-900/30 border-t border-slate-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="px-3 py-1 text-xs font-semibold text-rose-400 bg-rose-950/50 border border-rose-900 rounded-full uppercase tracking-wider">
+                    EMERGENCY PROCEDURES
+                </span>
+                <h2 class="text-3xl font-bold tracking-tight text-slate-100 mt-3 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-triangle-exclamation text-rose-500 animate-flash"></i> 虛擬緊急應變 SOP 模擬
+                </h2>
+                <p class="text-slate-400 mt-2 max-w-2xl mx-auto">當意外不期而至時，慌亂是最大的敵人。模擬真實事故情境，學習最正確的黃金處理步驟。</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <!-- 左側：事故情境選擇 -->
+                <div class="lg:col-span-4 space-y-3">
+                    <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wider pl-1">請選擇事故情境</h4>
+                    <button onclick="selectIncident('splash')" id="btn-inc-splash" class="incident-btn w-full text-left p-4 rounded-2xl glass-card border border-rose-500/30 hover:border-rose-400 bg-rose-950/20 text-rose-300 transition-all duration-300 flex items-center space-x-3">
+                        <i class="fa-solid fa-eye-dropper text-xl"></i>
+                        <div>
+                            <p class="font-bold text-sm">化學液體濺灑到皮膚/眼部</p>
+                            <p class="text-xs text-rose-400/80 mt-0.5">需要立即性物理沖洗</p>
+                        </div>
+                    </button>
+                    <button onclick="selectIncident('fire')" id="btn-inc-fire" class="incident-btn w-full text-left p-4 rounded-2xl glass-card border border-slate-800 hover:border-slate-700 hover:bg-slate-900/50 text-slate-400 transition-all duration-300 flex items-center space-x-3">
+                        <i class="fa-solid fa-fire text-xl"></i>
+                        <div>
+                            <p class="font-bold text-sm text-slate-200">實驗台局部起火</p>
+                            <p class="text-xs text-slate-500 mt-0.5">初期火災控制與疏散</p>
+                        </div>
+                    </button>
+                    <button onclick="selectIncident('spill')" id="btn-inc-spill" class="incident-btn w-full text-left p-4 rounded-2xl glass-card border border-slate-800 hover:border-slate-700 hover:bg-slate-900/50 text-slate-400 transition-all duration-300 flex items-center space-x-3">
+                        <i class="fa-solid fa-dumpster text-xl"></i>
+                        <div>
+                            <p class="font-bold text-sm text-slate-200">大量化學品地面傾倒</p>
+                            <p class="text-xs text-slate-500 mt-0.5">通報、隔離與防砂圍堵</p>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- 右側：步驟互動引導 -->
+                <div class="lg:col-span-8 glass-card p-6 sm:p-8 rounded-3xl border border-slate-800 min-h-[400px] flex flex-col justify-between">
+                    <div>
+                        <!-- 事件標題與嚴重性 -->
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
+                            <div class="flex items-center space-x-3">
+                                <span class="p-2 bg-rose-500/10 border border-rose-500/30 text-rose-400 rounded-lg" id="inc-icon-box">
+                                    <i class="fa-solid fa-eye-dropper"></i>
+                                </span>
+                                <div>
+                                    <h4 id="inc-title" class="font-bold text-lg text-slate-100">化學液體濺灑到皮膚/眼部</h4>
+                                    <p class="text-xs text-slate-500 mt-0.5">嚴重等級：<span class="text-rose-500 font-bold" id="inc-level">★★★ HIGH</span></p>
+                                </div>
+                            </div>
+                            <span class="text-xs bg-slate-900 border border-slate-800 px-3 py-1 rounded-full text-slate-400">標準急救流程</span>
+                        </div>
+
+                        <!-- 步驟內容展示 -->
+                        <div class="space-y-6">
+                            <p id="inc-description" class="text-slate-300 text-sm leading-relaxed">
+                                ※ 警告：強酸或強鹼等腐蝕性化學品一旦接觸眼部或皮膚，會在極短時間內造成組織灼傷，務必以最快速度處置！
+                            </p>
+                            
+                            <!-- 互動步驟清單 -->
+                            <div class="space-y-3" id="steps-list">
+                                <!-- 由 JS 動態生成 -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 底部模擬操作 -->
+                    <div class="mt-8 pt-6 border-t border-slate-800 flex flex-wrap items-center justify-between gap-4">
+                        <div class="text-xs text-slate-500 flex items-center gap-1.5">
+                            <i class="fa-solid fa-shield-virus text-emerald-500"></i> 請按照順序點擊執行步驟，累積正確應變知識
+                        </div>
+                        <button onclick="resetIncidentSteps()" class="text-xs text-slate-400 hover:text-slate-200 flex items-center gap-1">
+                            <i class="fa-solid fa-rotate-left"></i> 重置此事件模擬
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 急救電話與緊急設備快速指引 -->
+    <section id="emergency" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- 電話卡 1 -->
+            <div class="bg-rose-950/20 border border-rose-500/30 p-6 rounded-2xl flex items-start space-x-4">
+                <div class="p-3.5 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-2xl">
+                    <i class="fa-solid fa-phone-volume"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-slate-200">實驗室緊急救援專線</h4>
+                    <p class="text-sm text-slate-400 mt-1">若發生任何危害生命事件，請立即撥打校園內線/廠區警衛室。</p>
+                    <p class="text-2xl font-black text-rose-400 mt-3 tracking-wider">#9999 <span class="text-xs font-normal text-slate-500">(廠內/校內)</span></p>
+                </div>
+            </div>
+
+            <!-- 設備卡 2 -->
+            <div class="glass-card p-6 rounded-2xl flex items-start space-x-4">
+                <div class="p-3.5 bg-cyan-500/10 border border-cyan-500/30 rounded-xl text-cyan-400 text-2xl">
+                    <i class="fa-solid fa-shower"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-slate-200">緊急洗眼器 & 淋浴間</h4>
+                    <p class="text-sm text-slate-400 mt-1">位於實驗室入口右側。當濺灑發生時，直接推動拉桿，沖洗時間最少需達 15 分鐘。</p>
+                    <span class="inline-block mt-3 px-2.5 py-0.5 text-[11px] font-semibold text-cyan-400 bg-cyan-950/40 border border-cyan-900 rounded-full">每週定期點檢</span>
+                </div>
+            </div>
+
+            <!-- 設備卡 3 -->
+            <div class="glass-card p-6 rounded-2xl flex items-start space-x-4 col-span-1 md:col-span-2 lg:col-span-1">
+                <div class="p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-400 text-2xl">
+                    <i class="fa-solid fa-fire-extinguisher"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-slate-200">滅火設備 (二氧化碳 / 乾粉)</h4>
+                    <p class="text-sm text-slate-400 mt-1">滅火器位於走廊轉角與通風櫥旁。使用前務必確認火災類型（特別是禁水性物質火災）。</p>
+                    <span class="inline-block mt-3 px-2.5 py-0.5 text-[11px] font-semibold text-amber-400 bg-amber-950/40 border border-amber-900 rounded-full">拉、瞄、壓、掃 (PASS)</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 頁尾 -->
+    <footer class="bg-slate-950 border-t border-slate-900 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs sm:text-sm text-slate-500">
+            <p class="flex items-center justify-center gap-1.5 text-slate-400 font-medium">
+                <i class="fa-solid fa-flask text-emerald-500"></i> 化學實驗室安全，關乎你我的生命財產安全。
+            </p>
+            <p class="mt-4">
+                本網頁安全準則依據 GHS 全球化學品統一分類和標籤制度、國家勞工安全衛生法規編製。
+            </p>
+            <p class="mt-2 text-[11px] text-slate-600">
+                &copy; 2026 CHEMSAFE. All rights reserved. 實驗室安全防護小組製。
+            </p>
+        </div>
+    </footer>
+
+    <!-- 自訂訊息提示框 (代替 alert) -->
+    <div id="customToast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="bg-slate-900 border border-emerald-500/30 text-emerald-400 px-5 py-3 rounded-2xl shadow-xl flex items-center space-x-3">
+            <i class="fa-solid fa-circle-check text-lg"></i>
+            <span id="toastMsg" class="text-sm font-medium">成功</span>
+        </div>
+    </div>
+
+    <!-- JavaScript 邏輯控制 -->
+    <script>
+        // ----------------- 資料定義 -----------------
+        const rulesData = [
+            {
+                id: 1,
+                category: 'ppe',
+                icon: 'fa-user-shield',
+                title: '必須穿戴實驗衣與安全眼鏡',
+                desc: '進入實驗室必須穿戴妥當防護衣物。安全眼鏡能防止揮發氣體、化學液體噴濺或固體碎片射入眼睛。',
+                importance: '高',
+                tip: '不可在實驗室內配戴隱形眼鏡，因為隱形眼鏡易吸附化學氣體，可能造成角膜嚴重受損。'
+            },
+            {
+                id: 2,
+                category: 'behavior',
+                icon: 'fa-ban',
+                title: '絕對禁止飲食、嬉戲、奔跑',
+                desc: '嚴禁在實驗室吃東西、喝水、嚼口香糖或貯存食物。手部、桌面或空氣中殘留的微量毒物可能隨食物入口。',
+                importance: '高',
+                tip: '禁止以實驗用燒杯充當飲水器皿。避免奔跑撞倒儀器或揮發毒性藥品。'
+            },
+            {
+                id: 3,
+                category: 'handling',
+                icon: 'fa-droplet-slash',
+                title: '正確稀釋酸液：「酸入水」',
+                desc: '稀釋濃酸（尤其是濃硫酸）時，必須將「酸緩慢地沿著玻璃棒倒入水中」，並不斷攪拌，絕對不可「將水倒入酸中」。',
+                importance: '極高',
+                tip: '水倒入濃酸中會因為瞬間釋放大量溶解熱使水沸騰，導致強酸混合物向外劇烈爆濺！'
+            },
+            {
+                id: 4,
+                category: 'handling',
+                icon: 'fa-wind',
+                title: '揮發性/毒性操作限在通風櫥',
+                desc: '凡是涉及產生有毒氣體、強烈刺激性氣體或易揮發性有機溶劑的實驗，必須全線在局限排氣的抽風櫥（通風櫥）內進行。',
+                importance: '高',
+                tip: '通風櫥玻璃拉門高度應維持在黃色指示線以下，確保吸入風速充足。'
+            },
+            {
+                id: 5,
+                category: 'emergency',
+                icon: 'fa-location-dot',
+                title: '熟記安全淋浴與洗眼器位置',
+                desc: '入館的第一堂課必須確認急救用淋浴器、洗眼器、滅火器、醫藥箱、逃生出口的精確位置。',
+                importance: '高',
+                tip: '意外發生時視線往往受阻，必須在閉眼狀態下也能藉由觸摸找到洗眼器與出口。'
+            },
+            {
+                id: 6,
+                category: 'handling',
+                icon: 'fa-trash-can',
+                title: '廢液分類處置，不可隨意傾倒',
+                desc: '化學廢液必須依照「有機廢液（含鹵素/不含鹵素）」、「無機酸鹼」、「重金屬」等類別，妥善分類倒入專用回收桶中。',
+                importance: '極高',
+                tip: '絕對不可倒入一般水槽洗手台，以免產生有毒氣體（例如酸遇氰化物釋放氰化氫）或腐蝕水管。'
+            },
+            {
+                id: 7,
+                category: 'ppe',
+                icon: 'fa-shoe-prints',
+                title: '禁止穿著涼鞋、拖鞋與短褲',
+                desc: '進實驗室時，下半身必須著長褲，並穿著完整包覆足部的鞋子（包鞋、布鞋）。',
+                importance: '中',
+                tip: '拖鞋與涼鞋會使腳部皮膚直接暴露於掉落的玻璃碎片或噴濺的酸鹼液體中。'
+            },
+            {
+                id: 8,
+                category: 'handling',
+                icon: 'fa-temperature-high',
+                title: '加熱操作必須有人在旁看守',
+                desc: '使用電熱板、本生燈或油浴鍋進行加熱反應時，人員必須在旁監控，絕對不可中途離去。',
+                importance: '高',
+                tip: '沸騰突沸或溶劑溢出，容易導致有機液體閃燃或玻璃容器爆裂。'
+            }
+        ];
+
+        const ghsData = {
+            flammable: {
+                title: '易燃物 (Flammables)',
+                eng: 'GHS02 - FLAMMABLE',
+                icon: 'fa-fire',
+                features: '本圖示代表物質具有易燃、自燃、遇水可能釋放易燃氣體，或具有自熱性、自我反應性的有機過氧化物。例如：乙醇、丙酮、乙醚、金屬鈉等。',
+                advice: '1. 遠離明火、火花及高溫表面。\n2. 妥善儲存於防爆化學櫃中。\n3. 使用時必須在通風櫥內，且附近不得有本生燈等熱源。'
+            },
+            oxidizing: {
+                title: '氧化性物質 (Oxidizers)',
+                eng: 'GHS03 - OXIDIZING',
+                icon: 'fa-circle-radiation',
+                features: '本圖示代表氧化性氣體、液體或固體。這些物質本身雖不一定可燃，但會提供氧氣助長其他物質燃燒，甚至引發劇烈爆炸。例如：雙氧水、高錳酸鉀、硝酸。',
+                advice: '1. 絕對避免與易燃物、還原劑混合儲存。\n2. 避免震動、摩擦與受熱。\n3. 搬運時防止包裝破損與洩漏。'
+            },
+            toxic: {
+                title: '急性毒性物質 (Acute Toxicity)',
+                eng: 'GHS06 - ACUTE TOXIC',
+                icon: 'fa-skull-crossbones',
+                features: '代表吸入、皮膚接觸或吞食可能導致中毒、致死，或有即時性嚴重身體損害的化學品。例如：氰化鉀、三氧化二砷、氯化汞等。',
+                advice: '1. 必須在抽風良好且具備防爆通風系統的環境操作。\n2. 嚴格穿戴防化學手套、護目鏡及實驗衣。\n3. 操作完畢後應立即洗手。'
+            },
+            corrosive: {
+                title: '腐蝕性物質 (Corrosives)',
+                eng: 'GHS05 - CORROSIVE',
+                icon: 'fa-vial-virus',
+                features: '本圖示代表化學品具有腐蝕金屬，或造成皮膚嚴重灼傷、眼睛永久性損傷的危害。例如：鹽酸、硫酸、氫氧化鈉、冰醋酸。',
+                advice: '1. 穿戴防酸鹼的丁腈橡膠手套及護目鏡。\n2. 稀釋時遵循「酸入水」規範。\n3. 若濺灑至眼部，立即以洗眼器連續沖洗15分鐘以上。'
+            },
+            health_hazard: {
+                title: '健康危害 (Health Hazards)',
+                eng: 'GHS08 - HEALTH HAZARD',
+                icon: 'fa-person-burst',
+                features: '代表物質可能導致呼吸道過敏、生殖毒性、基因突變、致癌性、特定器官毒性（長年累積損害）或吸入性危害。例如：苯、甲醛、重鉻酸鉀。',
+                advice: '1. 盡可能使用毒性較低的替代品。\n2. 進行長期操作時須佩戴符合標準的防毒口罩/面罩。\n3. 定期進行健康檢查與環境監測。'
+            }
+        };
+
+        const quizData = [
+            {
+                question: "1. 稀釋濃酸（例如濃硫酸）時，正確的操作方式是：",
+                options: [
+                    "將水緩慢地沿著玻璃棒倒入濃酸中，並快速攪拌",
+                    "將濃酸緩慢地沿著玻璃棒倒入水中，並不斷攪拌",
+                    "將水與濃酸同時快速倒入燒杯中混合"
+                ],
+                correct: 1,
+                explain: "正確答案是「將濃酸緩慢倒入水中」。因為濃硫酸溶解時會釋放極大熱量。如果將水倒入酸中，由於水的密度小於硫酸，水會浮在表面，高熱會使水瞬間汽化沸騰，造成酸液飛濺。反之，酸入水時，酸密度大會沉入水底並隨攪拌迅速散熱，較安全。"
+            },
+            {
+                question: "2. 如果化學藥液不慎濺入眼睛，第一時間的處置方式是：",
+                options: [
+                    "用乾淨的衛生紙大力揉眼睛，擦乾藥水",
+                    "找同學借用消炎眼藥水點幾滴，然後回座位繼續實驗",
+                    "立即前往洗眼器，撥開眼瞼，以清水沖洗至少 15 分鐘，隨後送醫"
+                ],
+                correct: 2,
+                explain: "正確答案是「以洗眼器沖洗至少 15 分鐘」。化學品濺入眼睛需要進行大量的物理稀釋與沖洗，切記不可揉眼（以免造成機械性受損），沖洗必須徹底，時間不低於15分鐘，並立即安排送醫。"
+            },
+            {
+                question: "3. 關於進入化學實驗室的穿著與個人保護裝備(PPE)，以下哪一項是『錯誤』的？",
+                options: [
+                    "在實驗室內，配戴隱形眼鏡比框架眼鏡更安全，可以防側噴",
+                    "必須穿著完整包覆腳部的鞋子，禁止穿拖鞋與涼鞋",
+                    "下半身必須穿長褲，不應穿短裙或短褲，以保護皮膚"
+                ],
+                correct: 0,
+                explain: "正確答案是「配戴隱形眼鏡更安全（此為錯誤敘述）」。化學氣體非常容易溶解在隱形眼鏡與眼角膜之間的淚液中，或者被隱形眼鏡材質吸附，導致化學品長時間高濃度附著於角膜上造成腐蝕損傷。因此實驗室禁止配戴隱形眼鏡。"
+            }
+        ];
+
+        const incidentData = {
+            splash: {
+                title: "化學液體濺灑到皮膚/眼部",
+                level: "★★★ HIGH",
+                icon: "fa-eye-dropper",
+                desc: "強酸、強鹼一旦噴濺至眼部或暴露的皮膚，會迅速穿透角膜或造成嚴重的化學性灼傷。黃金自救時間只有數秒，必須立刻採取行動！",
+                steps: [
+                    { text: "【步驟1】大聲呼救，通知實驗室導師與身邊同學協助。", done: false },
+                    { text: "【步驟2】引導受害者至最近的洗眼器/淋浴器，推開把手使水自動噴出。", done: false },
+                    { text: "【步驟3】若濺及眼睛，必須「手動撥開上下眼瞼」，確保水流充分沖洗眼球，不可閉眼。", done: false },
+                    { text: "【步驟4】持續沖洗至少 15-20 分鐘，在沖洗過程中，脫除沾染化學品的衣物。", done: false },
+                    { text: "【步驟5】沖洗完畢後，迅速披上乾淨防寒毯（防止體溫降低），並即刻送醫就診。", done: false }
+                ]
+            },
+            fire: {
+                title: "實驗台局部起火",
+                level: "★★★★ CRITICAL",
+                icon: "fa-fire",
+                desc: "加熱高揮發性有機溶劑（如乙醚、丙酮）若不慎溢出可能引發猛烈燃燒。保持冷靜，正確判斷火勢並選擇滅火工具。",
+                steps: [
+                    { text: "【步驟1】大聲喊「火警！」，警告周邊所有人，並立刻關閉實驗台的所有加熱源與瓦斯閥。", done: false },
+                    { text: "【步驟2】判斷火勢：若是局部小火（如燒杯口起火），用玻璃蓋或濕抹布蓋住窒息滅火。", done: false },
+                    { text: "【步驟3】若火勢蔓延，迅速取下最近的乾淨二氧化碳（CO2）或乾粉滅火器，對準火源根部噴射。", done: false },
+                    { text: "【步驟4】若火勢失去控制，立刻拉響實驗室火警警報器，迅速由安全通道逃生，並撥打 119 通報。", done: false }
+                ]
+            },
+            spill: {
+                title: "大量化學品地面傾倒",
+                level: "★★★ HIGH",
+                icon: "fa-dumpster",
+                desc: "化學藥劑（尤其是強酸鹼或高毒性有機溶劑）在地面大量傾倒時，嚴禁擅自用一般抹布拖地，否則會散發致命蒸氣或引發連帶化學反應。",
+                steps: [
+                    { text: "【步驟1】立即疏散波及區域的所有人員，拉起黃色警示帶，防止不知情者踩入污染區。", done: false },
+                    { text: "【步驟2】開啟實驗室窗戶與最大風速通風櫥，確保有害蒸氣迅速排出。", done: false },
+                    { text: "【步驟3】取出「緊急化學吸附包」，利用防砂、吸盤吸液棉等工具對擴散液體進行圍堵。", done: false },
+                    { text: "【步驟4】根據洩漏化學品性質，灑上中和劑（酸用碳酸氫鈉，鹼用稀檸檬酸）或活性碳粉吸附。", done: false },
+                    { text: "【步驟5】穿戴厚防護手套將吸附後的廢棄物鏟入封口廢料桶，貼上危害標籤送交專業處置。", done: false }
+                ]
+            }
+        };
+
+
+        // ----------------- 狀態管理 -----------------
+        let currentCategory = 'all';
+        let activeIncident = 'splash';
+        let currentQuizIndex = 0;
+        let score = 0;
+        let selectedOption = null;
+
+        // ----------------- 初始化與事件 -----------------
+        window.addEventListener('DOMContentLoaded', () => {
+            renderRules();
+            updateCategoryCounts();
+            renderGhsFirstLook();
+            loadQuizQuestion();
+            renderIncidentSteps();
+        });
+
+        // 頁面滾動
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 自訂 Toast
+        function showToast(message) {
+            const toast = document.getElementById('customToast');
+            const toastMsg = document.getElementById('toastMsg');
+            toastMsg.innerText = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // ----------------- 守則卡片渲染與過濾 -----------------
+        function renderRules() {
+            const grid = document.getElementById('rulesGrid');
+            const searchVal = document.getElementById('ruleSearch').value.toLowerCase();
+            
+            // 篩選
+            const filtered = rulesData.filter(rule => {
+                const matchesCategory = currentCategory === 'all' || rule.category === currentCategory;
+                const matchesSearch = rule.title.toLowerCase().includes(searchVal) || 
+                                      rule.desc.toLowerCase().includes(searchVal) ||
+                                      rule.tip.toLowerCase().includes(searchVal);
+                return matchesCategory && matchesSearch;
+            });
+
+            // 渲染
+            grid.innerHTML = '';
+            if (filtered.length === 0) {
+                document.getElementById('noRulesMsg').classList.remove('hidden');
+            } else {
+                document.getElementById('noRulesMsg').classList.add('hidden');
+                filtered.forEach(rule => {
+                    const card = document.createElement('div');
+                    card.className = "glass-card p-6 rounded-2xl border border-slate-800 flex flex-col justify-between group transition-all duration-300 glow-emerald";
+                    
+                    // 重要度標籤顏色
+                    let impColor = "bg-amber-950/50 border-amber-900 text-amber-400";
+                    if (rule.importance === '極高') {
+                        impColor = "bg-rose-950/50 border-rose-900 text-rose-400";
+                    } else if (rule.importance === '中') {
+                        impColor = "bg-slate-800/80 border-slate-700 text-slate-300";
+                    }
+
+                    card.innerHTML = `
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-10 h-10 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-xl flex items-center justify-center text-lg">
+                                    <i class="fa-solid ${rule.icon}"></i>
+                                </div>
+                                <span class="px-2.5 py-0.5 text-[10px] font-bold border rounded-full ${impColor}">
+                                    重要度: ${rule.importance}
+                                </span>
+                            </div>
+                            <h3 class="text-base sm:text-lg font-bold text-slate-100 group-hover:text-emerald-400 transition-colors">${rule.title}</h3>
+                            <p class="text-sm text-slate-400 mt-2.5 leading-relaxed">${rule.desc}</p>
+                        </div>
+                        <div class="mt-5 pt-4 border-t border-slate-800/60 bg-slate-900/30 -mx-6 -mb-6 p-6 rounded-b-2xl">
+                            <span class="text-xs font-semibold text-emerald-500 block mb-1">
+                                <i class="fa-solid fa-lightbulb"></i> 安全提示：
+                            </span>
+                            <p class="text-xs text-slate-400 leading-relaxed">${rule.tip}</p>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+        }
+
+        function filterCategory(category) {
+            currentCategory = category;
+            
+            // 更新按鈕樣式
+            const btns = document.querySelectorAll('.category-btn');
+            btns.forEach(btn => {
+                btn.className = "category-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 bg-slate-900 text-slate-400 border border-slate-800 hover:text-slate-200";
+            });
+
+            const activeBtn = document.getElementById(`btn-${category}`);
+            if (activeBtn) {
+                activeBtn.className = "category-btn active px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 bg-emerald-500 text-slate-950";
+            }
+
+            renderRules();
+        }
+
+        function filterRules() {
+            renderRules();
+        }
+
+        function updateCategoryCounts() {
+            document.getElementById('count-all').innerText = rulesData.length;
+            document.getElementById('count-ppe').innerText = rulesData.filter(r => r.category === 'ppe').length;
+            document.getElementById('count-handling').innerText = rulesData.filter(r => r.category === 'handling').length;
+            document.getElementById('count-emergency').innerText = rulesData.filter(r => r.category === 'emergency').length;
+            document.getElementById('count-behavior').innerText = rulesData.filter(r => r.category === 'behavior').length;
+        }
+
+        // ----------------- GHS 燈箱互動 -----------------
+        function renderGhsFirstLook() {
+            // 預載第一個 GHS 詳細資料，但不顯示
+            showGhsDetails('flammable');
+            document.getElementById('ghsModal').classList.add('hidden'); // 預設維持隱藏
+        }
+
+        function showGhsDetails(key) {
+            const item = ghsData[key];
+            if (!item) return;
+
+            const modal = document.getElementById('ghsModal');
+            const iconBox = document.getElementById('ghsModalIcon');
+            const title = document.getElementById('ghsModalTitle');
+            const eng = document.getElementById('ghsModalEng');
+            const features = document.getElementById('ghsModalFeatures');
+            const advice = document.getElementById('ghsModalAdvice');
+
+            iconBox.innerHTML = `<i class="fa-solid ${item.icon}"></i>`;
+            title.innerText = item.title;
+            eng.innerText = item.eng;
+            features.innerText = item.features;
+            advice.innerHTML = item.advice.replace(/\n/g, '<br>');
+
+            modal.classList.remove('hidden');
+            // 滾動稍微定位
+            modal.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function closeGhsDetails() {
+            document.getElementById('ghsModal').classList.add('hidden');
+        }
+
+        // ----------------- 安全挑戰賽 (Quiz) -----------------
+        function loadQuizQuestion() {
+            const q = quizData[currentQuizIndex];
+            document.getElementById('currentQuestionNum').innerText = currentQuizIndex + 1;
+            document.getElementById('totalQuestions').innerText = quizData.length;
+            document.getElementById('currentScore').innerText = score;
+            
+            // 進度條
+            const percent = ((currentQuizIndex + 1) / quizData.length) * 100;
+            document.getElementById('progressBar').style.width = `${percent}%`;
+
+            document.getElementById('questionText').innerText = q.question;
+
+            // 渲染選項
+            const optContainer = document.getElementById('optionsContainer');
+            optContainer.innerHTML = '';
+            selectedOption = null;
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.onclick = () => selectQuizOption(idx);
+                btn.className = "quiz-opt w-full text-left p-4 rounded-xl border border-slate-800 bg-slate-900/40 hover:border-slate-700 hover:bg-slate-900/90 text-sm transition-all duration-200 flex items-center justify-between group";
+                btn.id = `opt-${idx}`;
+                btn.innerHTML = `
+                    <span>${opt}</span>
+                    <span class="w-5 h-5 rounded-full border border-slate-700 group-hover:border-emerald-500/50 flex items-center justify-center text-xs"></span>
+                `;
+                optContainer.appendChild(btn);
+            });
+
+            // 隱藏反饋與下一題
+            document.getElementById('feedbackContainer').classList.add('hidden');
+            document.getElementById('nextBtn').classList.add('hidden');
+            document.getElementById('nextBtn').disabled = true;
+        }
+
+        function selectQuizOption(idx) {
+            if (selectedOption !== null) return; // 已作答則不能再改選
+            
+            selectedOption = idx;
+            const q = quizData[currentQuizIndex];
+            const feedback = document.getElementById('feedbackContainer');
+            const nextBtn = document.getElementById('nextBtn');
+            const isCorrect = idx === q.correct;
+
+            // 標示全部按鈕為不可點，並上色
+            const optBtns = document.querySelectorAll('.quiz-opt');
+            optBtns.forEach((btn, bIdx) => {
+                btn.disabled = true;
+                if (bIdx === q.correct) {
+                    btn.className = "quiz-opt w-full text-left p-4 rounded-xl border border-emerald-500 bg-emerald-950/20 text-emerald-300 text-sm flex items-center justify-between";
+                    btn.querySelector('span:last-child').innerHTML = `<i class="fa-solid fa-check text-emerald-400"></i>`;
+                    btn.querySelector('span:last-child').className = "w-5 h-5 rounded-full border border-emerald-500 flex items-center justify-center text-xs";
+                } else if (bIdx === idx) {
+                    btn.className = "quiz-opt w-full text-left p-4 rounded-xl border border-rose-500 bg-rose-950/20 text-rose-300 text-sm flex items-center justify-between";
+                    btn.querySelector('span:last-child').innerHTML = `<i class="fa-solid fa-xmark text-rose-400"></i>`;
+                    btn.querySelector('span:last-child').className = "w-5 h-5 rounded-full border border-rose-500 flex items-center justify-center text-xs";
+                } else {
+                    btn.className = "quiz-opt w-full text-left p-4 rounded-xl border border-slate-900 bg-slate-950/30 text-slate-600 text-sm flex items-center justify-between cursor-not-allowed";
+                }
+            });
+
+            // 更新分數與反饋面板
+            if (isCorrect) {
+                score += 100;
+                document.getElementById('currentScore').innerText = score;
+                feedback.className = "mt-6 p-5 rounded-2xl border border-emerald-500/20 bg-emerald-950/10 text-emerald-400/90 text-sm transition-all duration-300";
+                feedback.innerHTML = `
+                    <div class="flex items-center gap-1.5 font-bold mb-1"><i class="fa-solid fa-circle-check"></i> 答對了！</div>
+                    <p class="leading-relaxed text-xs text-slate-300">${q.explain}</p>
+                `;
+            } else {
+                feedback.className = "mt-6 p-5 rounded-2xl border border-rose-500/20 bg-rose-950/10 text-rose-400/90 text-sm transition-all duration-300";
+                feedback.innerHTML = `
+                    <div class="flex items-center gap-1.5 font-bold mb-1"><i class="fa-solid fa-circle-exclamation"></i> 答錯了！</div>
+                    <p class="leading-relaxed text-xs text-slate-300">${q.explain}</p>
+                `;
+            }
+
+            feedback.classList.remove('hidden');
+            nextBtn.classList.remove('hidden');
+            nextBtn.disabled = false;
+        }
+
+        function nextQuestion() {
+            if (currentQuizIndex < quizData.length - 1) {
+                currentQuizIndex++;
+                loadQuizQuestion();
+            } else {
+                // 結束展示成果
+                showQuizResult();
+            }
+        }
+
+        function showQuizResult() {
+            document.getElementById('quizContainer').classList.add('hidden');
+            const resContainer = document.getElementById('resultContainer');
+            resContainer.classList.remove('hidden');
+
+            const title = document.getElementById('resultTitle');
+            const text = document.getElementById('resultText');
+            const icon = document.getElementById('resultIcon');
+
+            if (score === quizData.length * 100) {
+                icon.className = "fa-solid fa-circle-check text-emerald-400";
+                title.innerText = "完美通關！實驗室通行許可";
+                text.innerText = "恭喜你！獲得滿分，具備了完善的實驗室基礎安全意識。請在實際實驗中繼續保持謹慎！";
+                showToast("🏆 完美通關挑戰！");
+            } else {
+                icon.className = "fa-solid fa-triangle-exclamation text-amber-400";
+                title.innerText = "再接再厲！建議重新複習";
+                text.innerText = `你在本次挑戰中獲得了 ${score} 分。為了確保您的生命安全，強烈建議您再次研讀錯誤的觀念解析。`;
+                showToast("📝 挑戰完成，仍有進步空間。");
+            }
+        }
+
+        function restartQuiz() {
+            currentQuizIndex = 0;
+            score = 0;
+            document.getElementById('resultContainer').classList.add('hidden');
+            document.getElementById('quizContainer').classList.remove('hidden');
+            loadQuizQuestion();
+        }
+
+        // ----------------- 緊急應變模擬器 (Incident Simulator) -----------------
+        function selectIncident(key) {
+            activeIncident = key;
+            
+            // 更新側邊按鈕點亮
+            const btns = document.querySelectorAll('.incident-btn');
+            btns.forEach(btn => {
+                btn.className = "incident-btn w-full text-left p-4 rounded-2xl glass-card border border-slate-800 hover:border-slate-700 hover:bg-slate-900/50 text-slate-400 transition-all duration-300 flex items-center space-x-3";
+                // 重設內部標題顏色
+                const titleNode = btn.querySelector('p:first-child');
+                if (titleNode) titleNode.className = "font-bold text-sm text-slate-200";
+            });
+
+            const activeBtn = document.getElementById(`btn-inc-${key}`);
+            if (activeBtn) {
+                activeBtn.className = "incident-btn w-full text-left p-4 rounded-2xl glass-card border border-rose-500/30 hover:border-rose-400 bg-rose-950/20 text-rose-300 transition-all duration-300 flex items-center space-x-3";
+                const titleNode = activeBtn.querySelector('p:first-child');
+                if (titleNode) titleNode.className = "font-bold text-sm text-rose-300";
+            }
+
+            // 更新中間顯示資訊
+            const data = incidentData[key];
+            document.getElementById('inc-title').innerText = data.title;
+            document.getElementById('inc-level').innerText = data.level;
+            document.getElementById('inc-icon-box').innerHTML = `<i class="fa-solid ${data.icon}"></i>`;
+            document.getElementById('inc-description').innerText = data.desc;
+
+            // 重新複製步驟狀態 (以免殘留已完成狀態)
+            data.steps.forEach(s => s.done = false);
+
+            renderIncidentSteps();
+        }
+
+        function renderIncidentSteps() {
+            const container = document.getElementById('steps-list');
+            container.innerHTML = '';
+            
+            const data = incidentData[activeIncident];
+            
+            // 檢查是否所有步驟都完成
+            const isAllDone = data.steps.every(s => s.done);
+
+            data.steps.forEach((step, idx) => {
+                const item = document.createElement('div');
+                
+                // 計算是否可被點選 (必須按順序點擊)
+                const isClickable = idx === 0 || data.steps[idx - 1].done;
+                
+                let cardClass = "";
+                if (step.done) {
+                    // 已完成
+                    cardClass = "border-emerald-500/40 bg-emerald-950/10 text-emerald-300";
+                } else if (isClickable) {
+                    // 下一個等待執行
+                    cardClass = "border-amber-500/40 bg-amber-950/15 text-amber-200 animate-pulse cursor-pointer hover:bg-amber-950/20";
+                } else {
+                    // 鎖定中
+                    cardClass = "border-slate-800/80 bg-slate-950/50 text-slate-600 cursor-not-allowed opacity-60";
+                }
+
+                item.className = `p-4 rounded-xl border text-xs sm:text-sm font-medium transition-all duration-300 flex items-center justify-between ${cardClass}`;
+                
+                if (isClickable && !step.done) {
+                    item.onclick = () => executeStep(idx);
+                }
+
+                item.innerHTML = `
+                    <span>${step.text}</span>
+                    <span class="flex-shrink-0 ml-3">
+                        ${step.done ? 
+                            '<i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>' : 
+                            (isClickable ? 
+                                '<span class="text-[10px] bg-amber-500 text-slate-950 px-2 py-0.5 rounded font-black">點擊執行</span>' : 
+                                '<i class="fa-solid fa-lock text-slate-700"></i>'
+                            )
+                        }
+                    </span>
+                `;
+                container.appendChild(item);
+            });
+
+            // 成功全完成回饋
+            if (isAllDone) {
+                const successDiv = document.createElement('div');
+                successDiv.className = "p-5 rounded-2xl border border-emerald-500 bg-emerald-950/20 text-emerald-400 mt-6 text-center animate-bounce";
+                successDiv.innerHTML = `
+                    <p class="font-bold text-base"><i class="fa-solid fa-trophy"></i> SOP 模擬演練成功！</p>
+                    <p class="text-xs text-slate-300 mt-1">您已成功掌握了此情境的所有標準緊急應變流程，處變不驚，生命無價。</p>
+                `;
+                container.appendChild(successDiv);
+                showToast("🎉 SOP 模擬全數完成！");
+            }
+        }
+
+        function executeStep(idx) {
+            const data = incidentData[activeIncident];
+            data.steps[idx].done = true;
+            renderIncidentSteps();
+        }
+
+        function resetIncidentSteps() {
+            const data = incidentData[activeIncident];
+            data.steps.forEach(s => s.done = false);
+            renderIncidentSteps();
+            showToast("已重置此事件的模擬進度");
+        }
+    </script>
+</body>
+</html>
